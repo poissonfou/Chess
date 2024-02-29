@@ -1,0 +1,25 @@
+.board-nums {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  margin-left: 1.2rem;
+}
+
+.board-nums span {
+  font-size: 1.5rem;
+  margin-bottom: 0rem;
+  margin-top: 3rem;
+}
+
+.board-letters {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+}
+
+.board-letters span {
+  font-size: 1.5rem;
+  margin-left: 4rem;
+  margin-right: 0.3rem;
+  margin-top: -1.8rem;
+}

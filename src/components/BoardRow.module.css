@@ -1,0 +1,79 @@
+.row {
+  width: auto;
+  height: auto;
+  background-color: aqua;
+  display: flex;
+  flex-direction: row;
+  margin-left: 1rem;
+}
+
+.row div {
+  width: 5rem;
+  height: 5rem;
+  background-size: contain;
+}
+
+.row button {
+  border: none;
+  padding: 0;
+}
+
+.dark {
+  background-color: rgb(36, 129, 36);
+}
+
+.light {
+  background-color: rgb(248, 238, 238);
+}
+
+.bp {
+  background-image: url("../assets/blackPawn.png");
+}
+
+.bh {
+  background-image: url("../assets/blackHook.png");
+}
+
+.bn {
+  background-image: url("../assets/blackKnight.png");
+}
+
+.bb {
+  background-image: url("../assets/blackBishop.png");
+}
+
+.bq {
+  background-image: url("../assets/blackQueen.png");
+}
+
+.bk {
+  background-image: url("../assets/blackKingpng.png");
+}
+
+.wp {
+  background-image: url("../assets/whitePawn.png");
+}
+
+.wh {
+  background-image: url("../assets/whiteHook.png");
+}
+
+.wn {
+  background-image: url("../assets/whiteKnight.png");
+}
+
+.wb {
+  background-image: url("../assets/whiteBishop.png");
+}
+
+.wq {
+  background-image: url("../assets/whiteQueen.png");
+}
+
+.wk {
+  background-image: url("../assets/whiteKing.png");
+}
+
+:where(.bp, .bh, .bn, .bb, .bq, .bk, .wp, .wh, .wn, .wb, .wq, .wk):hover {
+  cursor: pointer;
+}
