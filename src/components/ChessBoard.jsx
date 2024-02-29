@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import classes from "./ChessBoard.module.css";
+import { movePawn, moveKing } from "../helper/moves";
+
 import BoardRow from "./BoardRow";
 
 const arrBoard = [
@@ -34,8 +36,6 @@ function ChessBoard() {
       return false;
     }
 
-    console.log(board, color, coords);
-
     let [rowTo, idxTo] = event.target.id.split(".");
     let [rowFrom, idxFrom] = coords.split(".");
 
@@ -43,93 +43,66 @@ function ChessBoard() {
 
     if (color !== turn && coords) {
       if (piece.includes("p")) {
-        // console.log(`to ${rowTo} ${idxTo}, from ${rowFrom} ${idxFrom}`);
-
-        if (piece.includes("wp")) {
-          if (+rowTo >= +rowFrom) {
-            return false;
-          }
-          if (+rowTo < +rowFrom && idxTo == idxFrom) {
-            if (board[rowTo][idxTo] !== 0) return false;
-
-            if (+rowFrom == 6) {
-              if (+rowTo + 1 == +rowFrom || +rowTo + 2 == +rowFrom) return true;
-              return false;
-            }
-
-            return +rowTo + 1 == +rowFrom;
-          }
-
-          if (+idxTo > +idxFrom || +idxTo < +idxFrom) {
-            //check for en-passant later
-            if (board[rowTo][idxTo] === 0) return false;
-
-            piecesTaken.black.push(board[rowTo][idxTo]);
-
-            return true;
-          }
-          return true;
-        } else {
-          if (+rowTo <= +rowFrom) {
-            return false;
-          }
-
-          if (+rowTo > +rowFrom && idxTo == idxFrom) {
-            if (board[rowTo][idxTo] !== 0) return false;
-
-            if (+rowFrom == 1) {
-              if (+rowTo - 1 == +rowFrom || +rowTo - 2 == +rowFrom) return true;
-              return false;
-            }
-
-            return +rowTo - 1 == +rowFrom;
-          }
-
-          if (+idxTo < +idxFrom || +idxTo > +(+idxFrom)) {
-            if (board[rowTo][idxTo] === 0) return false;
-
-            piecesTaken.white.push(board[rowTo][idxTo]);
-
-            return true;
-          }
-          return true;
-        }
+        return movePawn(event, board, coords, piece, piecesTaken);
       }
       if (piece.includes("k")) {
-        console.log("king move");
-        if (board[rowTo][idxTo] === 0) {
-          console.log("checking");
+        return moveKing(event, board, coords, turn, piecesTaken);
+      }
+      if (piece.includes("h")) {
+        if (idxTo !== idxFrom && rowTo !== rowFrom) return false;
 
-          if (+rowTo + 1 == +rowFrom) {
-            if (
-              +idxTo + 1 == +idxFrom ||
-              +idxTo - 1 == +idxFrom ||
-              idxTo == idxFrom
-            )
-              return true;
-            return false;
+        if (rowTo == rowFrom) {
+          let start = idxTo < idxFrom ? idxTo : idxFrom;
+          let end = idxTo > idxFrom ? idxTo : idxFrom;
+          let isValid;
+
+          if (start === idxFrom) {
+            if (+start + 1 == idxTo) {
+              isValid = true;
+            } else {
+              start = +start + 1;
+              for (let i = start; i <= +end; i++) {
+                if (board[rowTo][i] !== 0) {
+                  isValid = false;
+                  return;
+                }
+              }
+              isValid = isValid === undefined ? true : false;
+            }
+          } else {
+            if (+start + 1 == idxFrom) {
+              isValid = true;
+            } else {
+              start = +start + 1;
+              console.log(start, end, board[rowTo]);
+              for (let i = start; i <= +end; i++) {
+                if (board[rowTo][i] !== 0) {
+                  isValid = false;
+                  return;
+                }
+              }
+              isValid = isValid === undefined ? true : false;
+            }
           }
-          if (+rowTo - 1 == +rowFrom) {
-            if (
-              +idxTo + 1 == +idxFrom ||
-              +idxTo - 1 == +idxFrom ||
-              idxTo == idxFrom
-            )
-              return true;
-            return false;
+
+          if (isValid) {
+            if (board[rowTo][idxTo] !== 0) {
+              turn == "white"
+                ? piecesTaken.black.push(board[rowTo][idxTo])
+                : piecesTaken.white.push(board[rowTo][idxTo]);
+            }
+            return true;
           }
-          if (+rowTo - 1 !== +rowFrom || +rowTo + 1 !== +rowFrom) return false;
-          if (+idxTo + 1 == +idxFrom || +idxTo - 1 == +idxFrom) return true;
           return false;
         }
 
-        return color === turn;
+        return true;
       }
     }
+    return false;
   }
 
   function handleMove(piece, color, event) {
-    console.log(piece, color, event);
     if (piece == "" && selectedPiece.length == 0) {
       return;
     }
@@ -138,8 +111,6 @@ function ChessBoard() {
       selectedPiece.push({ coords: event.target.id, piece: piece.slice(1, 3) });
       return;
     }
-
-    console.log(selectedPiece);
 
     if (!authMove(event, color, selectedPiece)) {
       setSelectedPiece((prevSelectedPiece) => {
