@@ -1,4 +1,8 @@
-import { checkDiagonal, checkVerticalAndHorizontal } from "./helper";
+import {
+  checkDiagonal,
+  checkVerticalAndHorizontal,
+  setPiecesTaken,
+} from "./helper";
 
 export function movePawn(initial, final, board, piece, piecesTaken) {
   if (piece.includes("wp")) {
@@ -55,41 +59,37 @@ export function movePawn(initial, final, board, piece, piecesTaken) {
 }
 
 export function moveKing(initial, final, board, turn, piecesTaken) {
-  if (board[final.row][final.idx] === 0) {
-    if (final.row + 1 == initial.row) {
-      if (
-        final.idx + 1 == initial.idx ||
-        final.idx - 1 == initial.idx ||
-        final.idx == initial.idx
-      )
-        return true;
+  if (initial.idx == final.idx) {
+    if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
       return false;
+    if (board[final.row][final.idx] !== 0) {
+      //check if taking is valid
+      setPiecesTaken(turn, final, piecesTaken);
     }
-    if (final.row - 1 == initial.row) {
-      if (
-        final.idx + 1 == initial.idx ||
-        final.idx - 1 == initial.idx ||
-        final.idx == initial.idx
-      )
-        return true;
-      return false;
-    }
-    if (final.row == initial.row) {
-      if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx)
-        return true;
-      return false;
-    }
-    if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx)
-      return true;
-    return false;
-  } else {
-    if (turn == "white") {
-      piecesTaken.black.push(board[final.row][final.idx]);
-    } else {
-      piecesTaken.white.push(board[final.row][final.idx]);
-    }
+    //check for checks
     return true;
   }
+  if (initial.row == final.row) {
+    if (final.idx + 1 !== initial.idx && final.idx - 1 !== initial.idx)
+      return false;
+    if (board[final.row][final.idx] !== 0) {
+      //check if taking is valid
+      setPiecesTaken(turn, final, piecesTaken);
+    }
+    //check for checks
+    return true;
+  }
+  if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
+    return false;
+  if (final.idx + 1 !== initial.idx && final.idx - 1 !== initial.idx)
+    return false;
+
+  if (board[final.row][final.idx] !== 0) {
+    //check if taking is valid
+    setPiecesTaken(turn, final, piecesTaken);
+  }
+  //check for checks
+  return true;
 }
 
 export function moveQueen(initial, final, board, piecesTaken, piece) {
@@ -103,9 +103,7 @@ export function moveQueen(initial, final, board, piecesTaken, piece) {
 
   if (isValid) {
     if (board[final.row][final.idx] !== 0) {
-      turn == "white"
-        ? piecesTaken.black.push(board[final.row][final.idx])
-        : piecesTaken.white.push(board[final.row][final.idx]);
+      setPiecesTaken(turn, final, piecesTaken);
     }
     return true;
   }
@@ -117,9 +115,7 @@ export function moveHook(initial, final, piecesTaken, board, turn) {
 
   if (checkVerticalAndHorizontal(board, initial, final)) {
     if (board[final.row][final.idx] !== 0) {
-      turn == "white"
-        ? piecesTaken.black.push(board[final.row][final.idx])
-        : piecesTaken.white.push(board[final.row][final.idx]);
+      setPiecesTaken(turn, final, piecesTaken);
     }
     return true;
   }
@@ -132,9 +128,7 @@ export function moveBishop(initial, final, piecesTaken, board, turn, piece) {
 
   if (checkDiagonal(board, initial, final, piece)) {
     if (board[final.row][final.idx] !== 0) {
-      turn == "white"
-        ? piecesTaken.black.push(board[final.row][final.idx])
-        : piecesTaken.white.push(board[final.row][final.idx]);
+      setPiecesTaken(turn, final, piecesTaken);
     }
     return true;
   }
@@ -149,9 +143,7 @@ export function moveKnight(initial, final, piecesTaken, board, turn) {
   if (final.row + 2 == initial.row || final.row - 2 == initial.row) {
     if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx) {
       if (board[final.row][final.idx] !== 0) {
-        turn == "white"
-          ? piecesTaken.black.push(board[final.row][final.idx])
-          : piecesTaken.white.push(board[final.row][final.idx]);
+        setPiecesTaken(turn, final, piecesTaken);
       }
       return true;
     }
@@ -160,9 +152,7 @@ export function moveKnight(initial, final, piecesTaken, board, turn) {
   if (final.row + 1 == initial.row || final.row - 1 == initial.row) {
     if (final.idx + 2 == initial.idx || final.idx - 2 == initial.idx) {
       if (board[final.row][final.idx] !== 0) {
-        turn == "white"
-          ? piecesTaken.black.push(board[final.row][final.idx])
-          : piecesTaken.white.push(board[final.row][final.idx]);
+        setPiecesTaken(turn, final, piecesTaken);
       }
       return true;
     }

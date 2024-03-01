@@ -80,6 +80,10 @@ function ChessBoard() {
       return;
     }
 
+    if (color !== turn && !selectedPiece.length) {
+      return;
+    }
+
     if (selectedPiece.length == 0 && piece !== "" && turn == color) {
       selectedPiece.push({ coords: event.target.id, piece: piece.slice(1, 3) });
       return;

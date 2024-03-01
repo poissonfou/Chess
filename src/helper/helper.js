@@ -8,6 +8,12 @@ export function getCoords(event, coords) {
   };
 }
 
+export function setPiecesTaken(turn, final, piecesTaken) {
+  turn == "white"
+    ? piecesTaken.black.push(board[final.row][final.idx])
+    : piecesTaken.white.push(board[final.row][final.idx]);
+}
+
 export function checkDiagonal(board, initial, final, piece) {
   let start = final.idx < initial.idx ? final.idx : initial.idx;
   let end = final.idx > initial.idx ? final.idx : initial.idx;
