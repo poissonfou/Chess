@@ -107,7 +107,7 @@ export function moveHook(event, coords, piecesTaken, board, turn) {
       for (let i = start; i < +end; i++) {
         if (board[rowTo][i] !== 0) {
           isValid = false;
-          return;
+          break;
         }
       }
       isValid = isValid === undefined ? true : false;
@@ -128,7 +128,7 @@ export function moveHook(event, coords, piecesTaken, board, turn) {
     for (let i = +start + 1; i < end; i++) {
       if (board[i][idxTo] !== 0) {
         isValid = false;
-        return;
+        break;
       }
     }
 
@@ -143,5 +143,71 @@ export function moveHook(event, coords, piecesTaken, board, turn) {
       return true;
     }
   }
+  return false;
+}
+
+export function moveBishop(event, coords, piecesTaken, board, turn) {
+  let [rowTo, idxTo] = event.target.id.split(".");
+  let [rowFrom, idxFrom] = coords.split(".");
+
+  if (idxTo !== idxFrom && rowTo == rowFrom) return false;
+  if (idxTo == idxFrom && rowTo !== rowFrom) return false;
+
+  let start = idxTo < idxFrom ? idxTo : idxFrom;
+  let end = idxTo > idxFrom ? idxTo : idxFrom;
+  let row;
+  let isValid;
+
+  if (idxTo > idxFrom) {
+    start = +start + 1;
+
+    if (rowTo > rowFrom) {
+      row = +rowFrom + 1;
+    } else {
+      row = +rowFrom - 1;
+    }
+
+    for (let i = start; i <= +end; i++) {
+      if (i == +idxTo && row == +rowTo) {
+        isValid = true;
+      } else if (board[row][i] !== 0) {
+        isValid = false;
+        break;
+      }
+      if (rowTo > rowFrom) {
+        row++;
+      } else {
+        row--;
+      }
+    }
+  } else {
+    end = +end - 1;
+
+    row = +rowTo;
+
+    for (let i = start; i <= +end; i++) {
+      if (i == +idxTo && row == +rowTo) {
+        isValid = true;
+      } else if (board[row][i] !== 0) {
+        isValid = false;
+        break;
+      }
+      if (rowTo > rowFrom) {
+        row--;
+      } else {
+        row++;
+      }
+    }
+  }
+
+  if (isValid) {
+    if (board[rowTo][idxTo] !== 0) {
+      turn == "white"
+        ? piecesTaken.black.push(board[rowTo][idxTo])
+        : piecesTaken.white.push(board[rowTo][idxTo]);
+    }
+    return true;
+  }
+
   return false;
 }
