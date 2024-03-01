@@ -1,51 +1,52 @@
-export function movePawn(event, board, coords, piece, piecesTaken) {
-  let [rowTo, idxTo] = event.target.id.split(".");
-  let [rowFrom, idxFrom] = coords.split(".");
+import { checkDiagonal, checkVerticalAndHorizontal } from "./helper";
 
+export function movePawn(initial, final, board, piece, piecesTaken) {
   if (piece.includes("wp")) {
-    if (+rowTo >= +rowFrom) {
+    if (final.row >= initial.row) {
       return false;
     }
-    if (+rowTo < +rowFrom && idxTo == idxFrom) {
-      if (board[rowTo][idxTo] !== 0) return false;
+    if (final.row < initial.row && final.idx == initial.idx) {
+      if (board[final.row][final.idx] !== 0) return false;
 
-      if (+rowFrom == 6) {
-        if (+rowTo + 1 == +rowFrom || +rowTo + 2 == +rowFrom) return true;
+      if (initial.row == 6) {
+        if (final.row + 1 == initial.row || final.row + 2 == initial.row)
+          return true;
         return false;
       }
 
-      return +rowTo + 1 == +rowFrom;
+      return final.row + 1 == initial.row;
     }
 
-    if (+idxTo > +idxFrom || +idxTo < +idxFrom) {
+    if (final.idx > initial.idx || final.idx < initial.idx) {
       //check for en-passant later
-      if (board[rowTo][idxTo] === 0) return false;
+      if (board[final.row][final.idx] === 0) return false;
 
-      piecesTaken.black.push(board[rowTo][idxTo]);
+      piecesTaken.black.push(board[final.row][final.idx]);
 
       return true;
     }
     return true;
   } else {
-    if (+rowTo <= +rowFrom) {
+    if (final.row <= initial.row) {
       return false;
     }
 
-    if (+rowTo > +rowFrom && idxTo == idxFrom) {
-      if (board[rowTo][idxTo] !== 0) return false;
+    if (final.row > initial.row && final.idx == initial.idx) {
+      if (board[final.row][final.idx] !== 0) return false;
 
-      if (+rowFrom == 1) {
-        if (+rowTo - 1 == +rowFrom || +rowTo - 2 == +rowFrom) return true;
+      if (initial.row == 1) {
+        if (final.row - 1 == initial.row || final.row - 2 == initial.row)
+          return true;
         return false;
       }
 
-      return +rowTo - 1 == +rowFrom;
+      return final.row - 1 == initial.row;
     }
 
-    if (+idxTo < +idxFrom || +idxTo > +(+idxFrom)) {
-      if (board[rowTo][idxTo] === 0) return false;
+    if (+final.idx < initial.idx || final.idx > initial.idx) {
+      if (board[final.row][final.idx] === 0) return false;
 
-      piecesTaken.white.push(board[rowTo][idxTo]);
+      piecesTaken.white.push(board[final.row][final.idx]);
 
       return true;
     }
@@ -53,158 +54,87 @@ export function movePawn(event, board, coords, piece, piecesTaken) {
   }
 }
 
-export function moveKing(event, board, coords, turn, piecesTaken) {
-  let [rowTo, idxTo] = event.target.id.split(".");
-  let [rowFrom, idxFrom] = coords.split(".");
-
-  if (board[rowTo][idxTo] === 0) {
-    if (+rowTo + 1 == +rowFrom) {
-      if (+idxTo + 1 == +idxFrom || +idxTo - 1 == +idxFrom || idxTo == idxFrom)
+export function moveKing(initial, final, board, turn, piecesTaken) {
+  if (board[final.row][final.idx] === 0) {
+    if (final.row + 1 == initial.row) {
+      if (
+        final.idx + 1 == initial.idx ||
+        final.idx - 1 == initial.idx ||
+        final.idx == initial.idx
+      )
         return true;
       return false;
     }
-    if (+rowTo - 1 == +rowFrom) {
-      if (+idxTo + 1 == +idxFrom || +idxTo - 1 == +idxFrom || idxTo == idxFrom)
+    if (final.row - 1 == initial.row) {
+      if (
+        final.idx + 1 == initial.idx ||
+        final.idx - 1 == initial.idx ||
+        final.idx == initial.idx
+      )
         return true;
       return false;
     }
-    if (+rowTo == +rowFrom) {
-      if (+idxTo + 1 == +idxFrom || +idxTo - 1 == +idxFrom) return true;
-
+    if (final.row == initial.row) {
+      if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx)
+        return true;
       return false;
     }
-    if (+idxTo + 1 == +idxFrom || +idxTo - 1 == +idxFrom) return true;
+    if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx)
+      return true;
     return false;
   } else {
     if (turn == "white") {
-      piecesTaken.black.push(board[rowTo][idxTo]);
+      piecesTaken.black.push(board[final.row][final.idx]);
     } else {
-      piecesTaken.white.push(board[rowTo][idxTo]);
+      piecesTaken.white.push(board[final.row][final.idx]);
     }
-    console.log(piecesTaken);
     return true;
   }
 }
 
-export function moveHook(event, coords, piecesTaken, board, turn) {
-  let [rowTo, idxTo] = event.target.id.split(".");
-  let [rowFrom, idxFrom] = coords.split(".");
-
-  if (idxTo !== idxFrom && rowTo !== rowFrom) return false;
-
-  let start;
-  let end;
+export function moveQueen(initial, final, board, piecesTaken, piece) {
   let isValid;
 
-  if (rowTo == rowFrom) {
-    start = idxTo < idxFrom ? idxTo : idxFrom;
-    end = idxTo > idxFrom ? idxTo : idxFrom;
-
-    start = +start + 1;
-    if (start == idxTo || start == idxFrom) {
-      isValid = true;
-    } else {
-      for (let i = start; i < +end; i++) {
-        if (board[rowTo][i] !== 0) {
-          isValid = false;
-          break;
-        }
-      }
-      isValid = isValid === undefined ? true : false;
-    }
-
-    if (isValid) {
-      if (board[rowTo][idxTo] !== 0) {
-        turn == "white"
-          ? piecesTaken.black.push(board[rowTo][idxTo])
-          : piecesTaken.white.push(board[rowTo][idxTo]);
-      }
-      return true;
-    }
+  if (final.row !== initial.row && final.idx !== initial.idx) {
+    isValid = checkDiagonal(board, initial, final, piece);
   } else {
-    start = rowTo < rowFrom ? rowTo : rowFrom;
-    end = rowTo > rowFrom ? rowTo : rowFrom;
-
-    for (let i = +start + 1; i < end; i++) {
-      if (board[i][idxTo] !== 0) {
-        isValid = false;
-        break;
-      }
-    }
-
-    isValid = isValid === undefined ? true : false;
-
-    if (isValid) {
-      if (board[rowTo][idxTo] !== 0) {
-        turn == "white"
-          ? piecesTaken.black.push(board[rowTo][idxTo])
-          : piecesTaken.white.push(board[rowTo][idxTo]);
-      }
-      return true;
-    }
-  }
-  return false;
-}
-
-export function moveBishop(event, coords, piecesTaken, board, turn) {
-  let [rowTo, idxTo] = event.target.id.split(".");
-  let [rowFrom, idxFrom] = coords.split(".");
-
-  if (idxTo !== idxFrom && rowTo == rowFrom) return false;
-  if (idxTo == idxFrom && rowTo !== rowFrom) return false;
-
-  let start = idxTo < idxFrom ? idxTo : idxFrom;
-  let end = idxTo > idxFrom ? idxTo : idxFrom;
-  let row;
-  let isValid;
-
-  if (idxTo > idxFrom) {
-    start = +start + 1;
-
-    if (rowTo > rowFrom) {
-      row = +rowFrom + 1;
-    } else {
-      row = +rowFrom - 1;
-    }
-
-    for (let i = start; i <= +end; i++) {
-      if (i == +idxTo && row == +rowTo) {
-        isValid = true;
-      } else if (board[row][i] !== 0) {
-        isValid = false;
-        break;
-      }
-      if (rowTo > rowFrom) {
-        row++;
-      } else {
-        row--;
-      }
-    }
-  } else {
-    end = +end - 1;
-
-    row = +rowTo;
-
-    for (let i = start; i <= +end; i++) {
-      if (i == +idxTo && row == +rowTo) {
-        isValid = true;
-      } else if (board[row][i] !== 0) {
-        isValid = false;
-        break;
-      }
-      if (rowTo > rowFrom) {
-        row--;
-      } else {
-        row++;
-      }
-    }
+    isValid = checkVerticalAndHorizontal(board, initial, final);
   }
 
   if (isValid) {
-    if (board[rowTo][idxTo] !== 0) {
+    if (board[final.row][final.idx] !== 0) {
       turn == "white"
-        ? piecesTaken.black.push(board[rowTo][idxTo])
-        : piecesTaken.white.push(board[rowTo][idxTo]);
+        ? piecesTaken.black.push(board[final.row][final.idx])
+        : piecesTaken.white.push(board[final.row][final.idx]);
+    }
+    return true;
+  }
+  return false;
+}
+
+export function moveHook(initial, final, piecesTaken, board, turn) {
+  if (final.idx !== initial.idx && final.row !== initial.row) return false;
+
+  if (checkVerticalAndHorizontal(board, initial, final)) {
+    if (board[final.row][final.idx] !== 0) {
+      turn == "white"
+        ? piecesTaken.black.push(board[final.row][final.idx])
+        : piecesTaken.white.push(board[final.row][final.idx]);
+    }
+    return true;
+  }
+  return false;
+}
+
+export function moveBishop(initial, final, piecesTaken, board, turn, piece) {
+  if (final.idx !== initial.idx && final.row == initial.row) return false;
+  if (final.idx == initial.idx && final.row !== initial.row) return false;
+
+  if (checkDiagonal(board, initial, final, piece)) {
+    if (board[final.row][final.idx] !== 0) {
+      turn == "white"
+        ? piecesTaken.black.push(board[final.row][final.idx])
+        : piecesTaken.white.push(board[final.row][final.idx]);
     }
     return true;
   }
@@ -212,35 +142,31 @@ export function moveBishop(event, coords, piecesTaken, board, turn) {
   return false;
 }
 
-export function moveKnight(event, coords, piecesTaken, board, turn) {
-  let [rowTo, idxTo] = event.target.id.split(".");
-  let [rowFrom, idxFrom] = coords.split(".");
+export function moveKnight(initial, final, piecesTaken, board, turn) {
+  if (final.idx !== initial.idx && final.row == initial.row) return false;
+  if (final.idx == initial.idx && final.row !== initial.row) return false;
 
-  if (idxTo !== idxFrom && rowTo == rowFrom) return false;
-  if (idxTo == idxFrom && rowTo !== rowFrom) return false;
-
-  if (+rowTo + 2 == rowFrom || +rowTo - 2 == rowFrom) {
-    if (+idxTo + 1 == idxFrom || +idxTo - 1 == idxFrom) {
-      if (board[rowTo][idxTo] !== 0) {
+  if (final.row + 2 == initial.row || final.row - 2 == initial.row) {
+    if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx) {
+      if (board[final.row][final.idx] !== 0) {
         turn == "white"
-          ? piecesTaken.black.push(board[rowTo][idxTo])
-          : piecesTaken.white.push(board[rowTo][idxTo]);
+          ? piecesTaken.black.push(board[final.row][final.idx])
+          : piecesTaken.white.push(board[final.row][final.idx]);
       }
       return true;
     }
     return false;
   }
-  if (+rowTo + 1 == rowFrom || +rowTo - 1 == rowFrom) {
-    if (+idxTo + 2 == idxFrom || +idxTo - 2 == idxFrom) {
-      if (board[rowTo][idxTo] !== 0) {
+  if (final.row + 1 == initial.row || final.row - 1 == initial.row) {
+    if (final.idx + 2 == initial.idx || final.idx - 2 == initial.idx) {
+      if (board[final.row][final.idx] !== 0) {
         turn == "white"
-          ? piecesTaken.black.push(board[rowTo][idxTo])
-          : piecesTaken.white.push(board[rowTo][idxTo]);
+          ? piecesTaken.black.push(board[final.row][final.idx])
+          : piecesTaken.white.push(board[final.row][final.idx]);
       }
       return true;
     }
     return false;
   }
-
   return false;
 }

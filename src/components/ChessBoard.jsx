@@ -7,7 +7,10 @@ import {
   moveHook,
   moveBishop,
   moveKnight,
+  moveQueen,
 } from "../helper/moves";
+
+import { getCoords } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
 
@@ -48,21 +51,25 @@ function ChessBoard() {
     if (rowTo == rowFrom && idxTo == idxFrom) return false;
 
     if (color !== turn && coords) {
+      const { initial, final } = getCoords(event, coords);
+
       if (piece.includes("p")) {
-        return movePawn(event, board, coords, piece, piecesTaken);
+        return movePawn(initial, final, board, piece, piecesTaken);
       }
       if (piece.includes("k")) {
-        return moveKing(event, board, coords, turn, piecesTaken);
+        return moveKing(initial, final, board, turn, piecesTaken);
       }
       if (piece.includes("h")) {
-        return moveHook(event, coords, piecesTaken, board, turn);
+        return moveHook(initial, final, piecesTaken, board, turn);
       }
-
       if (piece.includes("n")) {
-        return moveKnight(event, coords, piecesTaken, board, turn);
+        return moveKnight(initial, final, piecesTaken, board, turn);
+      }
+      if (piece.includes("q")) {
+        return moveQueen(initial, final, board, piecesTaken, piece);
       }
       if (piece.includes("b")) {
-        return moveBishop(event, coords, piecesTaken, board, turn);
+        return moveBishop(initial, final, piecesTaken, board, turn, piece);
       }
     }
     return false;
