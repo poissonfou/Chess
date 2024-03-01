@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import classes from "./ChessBoard.module.css";
-import { movePawn, moveKing } from "../helper/moves";
+import { movePawn, moveKing, moveHook } from "../helper/moves";
 
 import BoardRow from "./BoardRow";
 
@@ -49,54 +49,7 @@ function ChessBoard() {
         return moveKing(event, board, coords, turn, piecesTaken);
       }
       if (piece.includes("h")) {
-        if (idxTo !== idxFrom && rowTo !== rowFrom) return false;
-
-        if (rowTo == rowFrom) {
-          let start = idxTo < idxFrom ? idxTo : idxFrom;
-          let end = idxTo > idxFrom ? idxTo : idxFrom;
-          let isValid;
-
-          if (start === idxFrom) {
-            if (+start + 1 == idxTo) {
-              isValid = true;
-            } else {
-              start = +start + 1;
-              for (let i = start; i <= +end; i++) {
-                if (board[rowTo][i] !== 0) {
-                  isValid = false;
-                  return;
-                }
-              }
-              isValid = isValid === undefined ? true : false;
-            }
-          } else {
-            if (+start + 1 == idxFrom) {
-              isValid = true;
-            } else {
-              start = +start + 1;
-              console.log(start, end, board[rowTo]);
-              for (let i = start; i <= +end; i++) {
-                if (board[rowTo][i] !== 0) {
-                  isValid = false;
-                  return;
-                }
-              }
-              isValid = isValid === undefined ? true : false;
-            }
-          }
-
-          if (isValid) {
-            if (board[rowTo][idxTo] !== 0) {
-              turn == "white"
-                ? piecesTaken.black.push(board[rowTo][idxTo])
-                : piecesTaken.white.push(board[rowTo][idxTo]);
-            }
-            return true;
-          }
-          return false;
-        }
-
-        return true;
+        return moveHook(event, coords, piecesTaken, board, turn);
       }
     }
     return false;

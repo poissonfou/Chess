@@ -86,4 +86,62 @@ export function moveKing(event, board, coords, turn, piecesTaken) {
   }
 }
 
-export function moveHook() {}
+export function moveHook(event, coords, piecesTaken, board, turn) {
+  let [rowTo, idxTo] = event.target.id.split(".");
+  let [rowFrom, idxFrom] = coords.split(".");
+
+  if (idxTo !== idxFrom && rowTo !== rowFrom) return false;
+
+  let start;
+  let end;
+  let isValid;
+
+  if (rowTo == rowFrom) {
+    start = idxTo < idxFrom ? idxTo : idxFrom;
+    end = idxTo > idxFrom ? idxTo : idxFrom;
+
+    start = +start + 1;
+    if (start == idxTo || start == idxFrom) {
+      isValid = true;
+    } else {
+      for (let i = start; i < +end; i++) {
+        if (board[rowTo][i] !== 0) {
+          isValid = false;
+          return;
+        }
+      }
+      isValid = isValid === undefined ? true : false;
+    }
+
+    if (isValid) {
+      if (board[rowTo][idxTo] !== 0) {
+        turn == "white"
+          ? piecesTaken.black.push(board[rowTo][idxTo])
+          : piecesTaken.white.push(board[rowTo][idxTo]);
+      }
+      return true;
+    }
+  } else {
+    start = rowTo < rowFrom ? rowTo : rowFrom;
+    end = rowTo > rowFrom ? rowTo : rowFrom;
+
+    for (let i = +start + 1; i < end; i++) {
+      if (board[i][idxTo] !== 0) {
+        isValid = false;
+        return;
+      }
+    }
+
+    isValid = isValid === undefined ? true : false;
+
+    if (isValid) {
+      if (board[rowTo][idxTo] !== 0) {
+        turn == "white"
+          ? piecesTaken.black.push(board[rowTo][idxTo])
+          : piecesTaken.white.push(board[rowTo][idxTo]);
+      }
+      return true;
+    }
+  }
+  return false;
+}
