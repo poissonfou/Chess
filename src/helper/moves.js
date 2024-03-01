@@ -211,3 +211,36 @@ export function moveBishop(event, coords, piecesTaken, board, turn) {
 
   return false;
 }
+
+export function moveKnight(event, coords, piecesTaken, board, turn) {
+  let [rowTo, idxTo] = event.target.id.split(".");
+  let [rowFrom, idxFrom] = coords.split(".");
+
+  if (idxTo !== idxFrom && rowTo == rowFrom) return false;
+  if (idxTo == idxFrom && rowTo !== rowFrom) return false;
+
+  if (+rowTo + 2 == rowFrom || +rowTo - 2 == rowFrom) {
+    if (+idxTo + 1 == idxFrom || +idxTo - 1 == idxFrom) {
+      if (board[rowTo][idxTo] !== 0) {
+        turn == "white"
+          ? piecesTaken.black.push(board[rowTo][idxTo])
+          : piecesTaken.white.push(board[rowTo][idxTo]);
+      }
+      return true;
+    }
+    return false;
+  }
+  if (+rowTo + 1 == rowFrom || +rowTo - 1 == rowFrom) {
+    if (+idxTo + 2 == idxFrom || +idxTo - 2 == idxFrom) {
+      if (board[rowTo][idxTo] !== 0) {
+        turn == "white"
+          ? piecesTaken.black.push(board[rowTo][idxTo])
+          : piecesTaken.white.push(board[rowTo][idxTo]);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  return false;
+}

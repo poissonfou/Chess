@@ -1,7 +1,13 @@
 import { useState } from "react";
 
 import classes from "./ChessBoard.module.css";
-import { movePawn, moveKing, moveHook, moveBishop } from "../helper/moves";
+import {
+  movePawn,
+  moveKing,
+  moveHook,
+  moveBishop,
+  moveKnight,
+} from "../helper/moves";
 
 import BoardRow from "./BoardRow";
 
@@ -50,6 +56,10 @@ function ChessBoard() {
       }
       if (piece.includes("h")) {
         return moveHook(event, coords, piecesTaken, board, turn);
+      }
+
+      if (piece.includes("n")) {
+        return moveKnight(event, coords, piecesTaken, board, turn);
       }
       if (piece.includes("b")) {
         return moveBishop(event, coords, piecesTaken, board, turn);
