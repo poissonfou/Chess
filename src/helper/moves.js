@@ -4,7 +4,15 @@ import {
   setPiecesTaken,
 } from "./helper";
 
-export function movePawn(initial, final, board, piece, piecesTaken) {
+export function movePawn(
+  initial,
+  final,
+  board,
+  piece,
+  piecesTaken,
+  enPassant,
+  setEnPassant
+) {
   if (piece.includes("wp")) {
     if (final.row >= initial.row) {
       return false;
@@ -13,8 +21,17 @@ export function movePawn(initial, final, board, piece, piecesTaken) {
       if (board[final.row][final.idx] !== 0) return false;
 
       if (initial.row == 6) {
-        if (final.row + 1 == initial.row || final.row + 2 == initial.row)
+        if (final.row + 1 == initial.row || final.row + 2 == initial.row) {
+          if (final.row + 2 == initial.row) {
+            if (
+              board[final.row][final.idx + 1] == "bp" ||
+              board[final.row][final.idx - 1] == "bp"
+            ) {
+              setEnPassant(true);
+            }
+          }
           return true;
+        }
         return false;
       }
 
@@ -22,7 +39,12 @@ export function movePawn(initial, final, board, piece, piecesTaken) {
     }
 
     if (final.idx > initial.idx || final.idx < initial.idx) {
-      //check for en-passant later
+      if (enPassant) {
+        if (board[initial.row][final.idx] == "bp") {
+          piecesTaken.black.push(board[initial.row][final.idx]);
+        }
+        return true;
+      }
       if (board[final.row][final.idx] === 0) return false;
 
       piecesTaken.black.push(board[final.row][final.idx]);
@@ -39,8 +61,17 @@ export function movePawn(initial, final, board, piece, piecesTaken) {
       if (board[final.row][final.idx] !== 0) return false;
 
       if (initial.row == 1) {
-        if (final.row - 1 == initial.row || final.row - 2 == initial.row)
+        if (final.row - 1 == initial.row || final.row - 2 == initial.row) {
+          if (final.row - 2 == initial.row) {
+            if (
+              board[final.row][final.idx + 1] == "wp" ||
+              board[final.row][final.idx - 1] == "wp"
+            ) {
+              setEnPassant(true);
+            }
+          }
           return true;
+        }
         return false;
       }
 
@@ -48,6 +79,13 @@ export function movePawn(initial, final, board, piece, piecesTaken) {
     }
 
     if (+final.idx < initial.idx || final.idx > initial.idx) {
+      if (enPassant) {
+        if (board[initial.row][final.idx] == "wp") {
+          piecesTaken.white.push(board[initial.row][final.idx]);
+        }
+        return true;
+      }
+
       if (board[final.row][final.idx] === 0) return false;
 
       piecesTaken.white.push(board[final.row][final.idx]);

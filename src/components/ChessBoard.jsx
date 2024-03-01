@@ -26,12 +26,17 @@ const arrBoard = [
 ];
 
 let piecesTaken = { white: [], black: [] };
+let enPassant = false;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
   // const [piecesTaken, setPiecesTaken] = useState({ white: [], black: [] });
+
+  function setEnPassant(val) {
+    enPassant = val;
+  }
 
   function changeTurns() {
     setTurn((prevTurn) => {
@@ -53,8 +58,20 @@ function ChessBoard() {
     if (color !== turn && coords) {
       const { initial, final } = getCoords(event, coords);
 
+      if (enPassant && !piece.includes("p")) {
+        setEnPassant(false);
+      }
+
       if (piece.includes("p")) {
-        return movePawn(initial, final, board, piece, piecesTaken);
+        return movePawn(
+          initial,
+          final,
+          board,
+          piece,
+          piecesTaken,
+          enPassant,
+          setEnPassant
+        );
       }
       if (piece.includes("k")) {
         return moveKing(initial, final, board, turn, piecesTaken);
@@ -104,16 +121,27 @@ function ChessBoard() {
 
     setBoard((prevBoard) => {
       let newBoard = prevBoard;
-      newBoard[rowTo][idxTo] = selectedPiece[0].piece;
-      newBoard[rowFrom][idxFrom] = 0;
+      if (enPassant) {
+        newBoard[rowTo][idxTo] = selectedPiece[0].piece;
+        newBoard[rowFrom][idxTo] = 0;
+        newBoard[rowFrom][idxFrom] = 0;
+      } else {
+        newBoard[rowTo][idxTo] = selectedPiece[0].piece;
+        newBoard[rowFrom][idxFrom] = 0;
+      }
       return [...newBoard];
     });
+
+    if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
+      setEnPassant(false);
+    }
 
     setSelectedPiece((prevSelectedPiece) => {
       let reset = prevSelectedPiece;
       reset = [];
       return reset;
     });
+
     changeTurns();
   }
 
