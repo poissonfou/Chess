@@ -10,7 +10,7 @@ import {
   moveQueen,
 } from "../helper/moves";
 
-import { getCoords } from "../helper/helper";
+import { getCoords, isChecking } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
 
@@ -26,13 +26,26 @@ const arrBoard = [
 ];
 
 let piecesTaken = { white: [], black: [] };
+let kingsPosition = { white: { row: 7, idx: 4 }, black: { row: 0, idx: 4 } };
 let enPassant = false;
+let identifier;
+// let isValid;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
   // const [piecesTaken, setPiecesTaken] = useState({ white: [], black: [] });
+
+  function updateKingsPosition(turn, final) {
+    if (turn == "white") {
+      kingsPosition.white.row = final.row;
+      kingsPosition.white.idx = final.idx;
+      return;
+    }
+    kingsPosition.black.row = final.row;
+    kingsPosition.black.idx = final.idx;
+  }
 
   function setEnPassant(val) {
     enPassant = val;
@@ -55,6 +68,14 @@ function ChessBoard() {
 
     if (rowTo == rowFrom && idxTo == idxFrom) return false;
 
+    identifier = turn == "white" ? "b" : "w";
+
+    if (isChecking(board, kingsPosition[turn], identifier)) {
+      console.log("checking");
+    } else {
+      console.log("not checking");
+    }
+
     if (color !== turn && coords) {
       const { initial, final } = getCoords(event, coords);
 
@@ -74,7 +95,14 @@ function ChessBoard() {
         );
       }
       if (piece.includes("k")) {
-        return moveKing(initial, final, board, turn, piecesTaken);
+        return moveKing(
+          initial,
+          final,
+          board,
+          turn,
+          piecesTaken,
+          updateKingsPosition
+        );
       }
       if (piece.includes("h")) {
         return moveHook(initial, final, piecesTaken, board, turn);

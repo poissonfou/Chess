@@ -1,6 +1,6 @@
 import {
-  checkDiagonal,
-  checkVerticalAndHorizontal,
+  authDiagonal,
+  authVerticalAndHorizontal,
   setPiecesTaken,
 } from "./helper";
 
@@ -96,7 +96,14 @@ export function movePawn(
   }
 }
 
-export function moveKing(initial, final, board, turn, piecesTaken) {
+export function moveKing(
+  initial,
+  final,
+  board,
+  turn,
+  piecesTaken,
+  updateKingsPosition
+) {
   if (initial.idx == final.idx) {
     if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
       return false;
@@ -104,6 +111,8 @@ export function moveKing(initial, final, board, turn, piecesTaken) {
       //check if taking is valid
       setPiecesTaken(turn, final, piecesTaken);
     }
+
+    updateKingsPosition(turn, final);
     //check for checks
     return true;
   }
@@ -114,6 +123,8 @@ export function moveKing(initial, final, board, turn, piecesTaken) {
       //check if taking is valid
       setPiecesTaken(turn, final, piecesTaken);
     }
+
+    updateKingsPosition(turn, final);
     //check for checks
     return true;
   }
@@ -126,6 +137,7 @@ export function moveKing(initial, final, board, turn, piecesTaken) {
     //check if taking is valid
     setPiecesTaken(turn, final, piecesTaken);
   }
+  updateKingsPosition(turn, final);
   //check for checks
   return true;
 }
@@ -134,9 +146,9 @@ export function moveQueen(initial, final, board, piecesTaken, piece) {
   let isValid;
 
   if (final.row !== initial.row && final.idx !== initial.idx) {
-    isValid = checkDiagonal(board, initial, final, piece);
+    isValid = authDiagonal(board, initial, final, piece);
   } else {
-    isValid = checkVerticalAndHorizontal(board, initial, final);
+    isValid = authVerticalAndHorizontal(board, initial, final);
   }
 
   if (isValid) {
@@ -151,7 +163,7 @@ export function moveQueen(initial, final, board, piecesTaken, piece) {
 export function moveHook(initial, final, piecesTaken, board, turn) {
   if (final.idx !== initial.idx && final.row !== initial.row) return false;
 
-  if (checkVerticalAndHorizontal(board, initial, final)) {
+  if (authVerticalAndHorizontal(board, initial, final)) {
     if (board[final.row][final.idx] !== 0) {
       setPiecesTaken(turn, final, piecesTaken);
     }
@@ -164,7 +176,7 @@ export function moveBishop(initial, final, piecesTaken, board, turn, piece) {
   if (final.idx !== initial.idx && final.row == initial.row) return false;
   if (final.idx == initial.idx && final.row !== initial.row) return false;
 
-  if (checkDiagonal(board, initial, final, piece)) {
+  if (authDiagonal(board, initial, final, piece)) {
     if (board[final.row][final.idx] !== 0) {
       setPiecesTaken(turn, final, piecesTaken);
     }
