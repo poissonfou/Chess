@@ -11,7 +11,8 @@ export function movePawn(
   piece,
   piecesTaken,
   enPassant,
-  setEnPassant
+  setEnPassant,
+  changePawnChecking
 ) {
   if (piece.includes("wp")) {
     if (final.row >= initial.row) {
@@ -30,10 +31,22 @@ export function movePawn(
               setEnPassant(true);
             }
           }
+          //check for king
+          if (
+            board[final.row - 1][final.idx - 1] == "bk" ||
+            board[final.row - 1][final.idx + 1] == "bk"
+          )
+            changePawnChecking(true);
           return true;
         }
         return false;
       }
+
+      if (
+        board[final.row - 1][final.idx - 1] == "bk" ||
+        board[final.row - 1][final.idx + 1] == "bk"
+      )
+        changePawnChecking(true);
 
       return final.row + 1 == initial.row;
     }
@@ -70,10 +83,22 @@ export function movePawn(
               setEnPassant(true);
             }
           }
+          if (
+            board[final.row + 1][final.idx - 1] == "wk" ||
+            board[final.row + 1][final.idx + 1] == "wk"
+          )
+            changePawnChecking(true);
+
           return true;
         }
         return false;
       }
+
+      if (
+        board[final.row + 1][final.idx - 1] == "wk" ||
+        board[final.row + 1][final.idx + 1] == "wk"
+      )
+        changePawnChecking(true);
 
       return final.row - 1 == initial.row;
     }

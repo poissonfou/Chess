@@ -104,6 +104,7 @@ export function checkDiagonal(
   let row = kingsPosition.row;
   let checking;
   let path = [];
+  let coords;
 
   while (true) {
     if (diagonal == 1) {
@@ -143,17 +144,24 @@ export function checkDiagonal(
       checking = path.every((el) => {
         return el == 0;
       });
+
+      coords = { diagonal: { row: row, idx: idx } };
       break;
     }
     path.push(board[row][idx]);
   }
 
-  return checking;
+  return {
+    checking,
+    coords,
+  };
 }
 
 export function checkHorses(direction, kingsPosition, board, identifierKnight) {
   let idx;
   let row;
+  let coords;
+  let checking = true;
 
   if (direction == "up-minus") {
     idx = kingsPosition.idx - 1;
@@ -195,24 +203,52 @@ export function checkHorses(direction, kingsPosition, board, identifierKnight) {
     row = kingsPosition.row + 1;
   }
 
-  if (idx > 7 || idx < 0 || row > 7 || row < 0) return;
+  if (idx > 7 || idx < 0 || row > 7 || row < 0)
+    return {
+      cheking: false,
+      coords: 0,
+    };
 
   if (board[row][idx] == identifierKnight) {
-    return true;
+    coords = { knight: { row, idx } };
+    return {
+      checking,
+      coords,
+    };
   }
-  return false;
+  return {
+    cheking: false,
+    coords: 0,
+  };
 }
 
-export function isChecking(board, kingsPosition, identifier) {
-  let checking;
+export function isChecking(
+  board,
+  kingsPosition,
+  identifier,
+  pawnChecking,
+  moves
+) {
   let start;
   let end;
+  let piecesAttacking = [];
+  let pawn;
+  let idx;
 
   let identifierHook = identifier + "h";
   let identifierQueen = identifier + "q";
   let identifierBishop = identifier + "b";
   let identifierKnight = identifier + "n";
   let identifierPawn = identifier + "p";
+
+  //checking pawns
+  if (pawnChecking) {
+    idx = moves.length - 1;
+    pawn = moves[idx];
+    piecesAttacking.push({
+      pawn: { row: pawn[identifierPawn].row, idx: pawn[identifierPawn].idx },
+    });
+  }
 
   //checking horizontal
   if (
@@ -221,23 +257,25 @@ export function isChecking(board, kingsPosition, identifier) {
   ) {
     console.log("checking horizontal");
     for (let i = 0; i < board[kingsPosition.row].length; i++) {
-      if (board[kingsPosition.row][i] == `${identifier}h`) {
+      if (
+        board[kingsPosition.row][i] == identifierHook ||
+        board[kingsPosition.row][i] == identifierQueen
+      ) {
         start = i < kingsPosition.idx ? i : kingsPosition.idx;
         end = i > kingsPosition.idx ? i : kingsPosition.idx;
 
         for (let j = start + 1; j < end; j++) {
           if (board[kingsPosition.row][j] !== 0) {
-            checking = false;
             break;
           }
         }
+        piecesAttacking.push({
+          horizontal: { row: kingsPosition.row, idx: i },
+        });
+        break;
       }
     }
-    checking = checking == undefined ? true : false;
-    //do something with that info
   }
-
-  checking = undefined;
 
   //checking vertical
 
@@ -252,42 +290,31 @@ export function isChecking(board, kingsPosition, identifier) {
 
       for (let j = start + 1; j < end; j++) {
         if (board[j][kingsPosition.idx] !== 0) {
-          checking = false;
           break;
         }
       }
+      piecesAttacking.push({
+        vertical: { row: i, idx: kingsPosition.idx },
+      });
     }
   }
-
-  checking = checking == undefined ? true : false;
-  //do something;
-
-  checking = undefined;
 
   //check diagonal
   let diagonals = [1, 2, 3, 4];
 
   for (let i = 0; i < diagonals.length; i++) {
-    if (
-      checkDiagonal(
-        board,
-        diagonals[i],
-        kingsPosition,
-        identifierBishop,
-        identifierQueen
-      )
-    ) {
-      checking = true;
+    let { checking, coords } = checkDiagonal(
+      board,
+      diagonals[i],
+      kingsPosition,
+      identifierBishop,
+      identifierQueen
+    );
+    if (checking) {
+      piecesAttacking.push(coords);
       break;
     }
   }
-
-  if (checking) {
-    //do something
-    console.log("is checked");
-  }
-
-  checking = undefined;
 
   let directions = [
     "up-minus",
@@ -302,15 +329,22 @@ export function isChecking(board, kingsPosition, identifier) {
 
   //check horses
   for (let i = 0; i < directions.length; i++) {
-    if (checkHorses(directions[i], kingsPosition, board, identifierKnight)) {
-      checking = true;
+    let { checking, coords } = checkHorses(
+      directions[i],
+      kingsPosition,
+      board,
+      identifierKnight
+    );
+
+    if (checking) {
+      piecesAttacking.push(coords);
       break;
     }
   }
 
-  if (checking) {
+  if (piecesAttacking.length) {
     //do something
-    console.log("is checked");
+    console.log("is checked", piecesAttacking);
   }
 }
 

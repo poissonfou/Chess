@@ -26,8 +26,10 @@ const arrBoard = [
 ];
 
 let piecesTaken = { white: [], black: [] };
+let moves = [];
 let kingsPosition = { white: { row: 7, idx: 4 }, black: { row: 0, idx: 4 } };
 let enPassant = false;
+let pawnChecking = false;
 let identifier;
 // let isValid;
 
@@ -45,6 +47,10 @@ function ChessBoard() {
     }
     kingsPosition.black.row = final.row;
     kingsPosition.black.idx = final.idx;
+  }
+
+  function changePawnChecking(val) {
+    pawnChecking = val;
   }
 
   function setEnPassant(val) {
@@ -70,7 +76,9 @@ function ChessBoard() {
 
     identifier = turn == "white" ? "b" : "w";
 
-    if (isChecking(board, kingsPosition[turn], identifier)) {
+    if (
+      isChecking(board, kingsPosition[turn], identifier, pawnChecking, moves)
+    ) {
       console.log("checking");
     } else {
       console.log("not checking");
@@ -91,7 +99,8 @@ function ChessBoard() {
           piece,
           piecesTaken,
           enPassant,
-          setEnPassant
+          setEnPassant,
+          changePawnChecking
         );
       }
       if (piece.includes("k")) {
@@ -146,6 +155,14 @@ function ChessBoard() {
 
     let [rowTo, idxTo] = event.target.id.split(".");
     let [rowFrom, idxFrom] = selectedPiece[0].coords.split(".");
+
+    let obj = {};
+
+    obj[selectedPiece[0].piece] = {};
+    obj[selectedPiece[0].piece].row = rowTo;
+    obj[selectedPiece[0].piece].idx = idxTo;
+
+    moves.push(obj);
 
     setBoard((prevBoard) => {
       let newBoard = prevBoard;
