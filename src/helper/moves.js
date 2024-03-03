@@ -127,6 +127,8 @@ export function moveKing(
   board,
   turn,
   piecesTaken,
+  changePawnChecking,
+  pawnChecking,
   updateKingsPosition
 ) {
   if (initial.idx == final.idx) {
@@ -134,11 +136,12 @@ export function moveKing(
       return false;
     if (board[final.row][final.idx] !== 0) {
       //check if taking is valid
-      setPiecesTaken(turn, final, piecesTaken);
+      setPiecesTaken(turn, final, board, piecesTaken);
     }
 
     updateKingsPosition(turn, final);
     //check for checks
+    if (pawnChecking) changePawnChecking(false);
     return true;
   }
   if (initial.row == final.row) {
@@ -146,11 +149,12 @@ export function moveKing(
       return false;
     if (board[final.row][final.idx] !== 0) {
       //check if taking is valid
-      setPiecesTaken(turn, final, piecesTaken);
+      setPiecesTaken(turn, final, board, piecesTaken);
     }
 
     updateKingsPosition(turn, final);
     //check for checks
+    if (pawnChecking) changePawnChecking(false);
     return true;
   }
   if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
@@ -160,10 +164,11 @@ export function moveKing(
 
   if (board[final.row][final.idx] !== 0) {
     //check if taking is valid
-    setPiecesTaken(turn, final, piecesTaken);
+    setPiecesTaken(turn, final, board, piecesTaken);
   }
   updateKingsPosition(turn, final);
   //check for checks
+  if (pawnChecking) changePawnChecking(false);
   return true;
 }
 
@@ -178,7 +183,7 @@ export function moveQueen(initial, final, board, piecesTaken, piece) {
 
   if (isValid) {
     if (board[final.row][final.idx] !== 0) {
-      setPiecesTaken(turn, final, piecesTaken);
+      setPiecesTaken(turn, final, board, piecesTaken);
     }
     return true;
   }
@@ -190,7 +195,7 @@ export function moveHook(initial, final, piecesTaken, board, turn) {
 
   if (authVerticalAndHorizontal(board, initial, final)) {
     if (board[final.row][final.idx] !== 0) {
-      setPiecesTaken(turn, final, piecesTaken);
+      setPiecesTaken(turn, final, board, piecesTaken);
     }
     return true;
   }
@@ -203,7 +208,7 @@ export function moveBishop(initial, final, piecesTaken, board, turn, piece) {
 
   if (authDiagonal(board, initial, final, piece)) {
     if (board[final.row][final.idx] !== 0) {
-      setPiecesTaken(turn, final, piecesTaken);
+      setPiecesTaken(turn, final, board, piecesTaken);
     }
     return true;
   }
@@ -218,7 +223,7 @@ export function moveKnight(initial, final, piecesTaken, board, turn) {
   if (final.row + 2 == initial.row || final.row - 2 == initial.row) {
     if (final.idx + 1 == initial.idx || final.idx - 1 == initial.idx) {
       if (board[final.row][final.idx] !== 0) {
-        setPiecesTaken(turn, final, piecesTaken);
+        setPiecesTaken(turn, final, board, piecesTaken);
       }
       return true;
     }
@@ -227,7 +232,7 @@ export function moveKnight(initial, final, piecesTaken, board, turn) {
   if (final.row + 1 == initial.row || final.row - 1 == initial.row) {
     if (final.idx + 2 == initial.idx || final.idx - 2 == initial.idx) {
       if (board[final.row][final.idx] !== 0) {
-        setPiecesTaken(turn, final, piecesTaken);
+        setPiecesTaken(turn, final, board, piecesTaken);
       }
       return true;
     }

@@ -31,13 +31,22 @@ let kingsPosition = { white: { row: 7, idx: 4 }, black: { row: 0, idx: 4 } };
 let enPassant = false;
 let pawnChecking = false;
 let identifier;
-// let isValid;
+let piecesAttacking = [];
+let kingColor;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
   // const [piecesTaken, setPiecesTaken] = useState({ white: [], black: [] });
+
+  function resetPiece() {
+    setSelectedPiece((prevSelectedPiece) => {
+      let resetPiece = prevSelectedPiece;
+      resetPiece.pop();
+      return resetPiece;
+    });
+  }
 
   function updateKingsPosition(turn, final) {
     if (turn == "white") {
@@ -74,16 +83,6 @@ function ChessBoard() {
 
     if (rowTo == rowFrom && idxTo == idxFrom) return false;
 
-    identifier = turn == "white" ? "b" : "w";
-
-    if (
-      isChecking(board, kingsPosition[turn], identifier, pawnChecking, moves)
-    ) {
-      console.log("checking");
-    } else {
-      console.log("not checking");
-    }
-
     if (color !== turn && coords) {
       const { initial, final } = getCoords(event, coords);
 
@@ -110,6 +109,8 @@ function ChessBoard() {
           board,
           turn,
           piecesTaken,
+          changePawnChecking,
+          pawnChecking,
           updateKingsPosition
         );
       }
@@ -144,11 +145,7 @@ function ChessBoard() {
     }
 
     if (!authMove(event, color, selectedPiece)) {
-      setSelectedPiece((prevSelectedPiece) => {
-        let reset = prevSelectedPiece;
-        reset = [];
-        return reset;
-      });
+      resetPiece();
       console.log("invalid move!");
       return;
     }
@@ -156,36 +153,67 @@ function ChessBoard() {
     let [rowTo, idxTo] = event.target.id.split(".");
     let [rowFrom, idxFrom] = selectedPiece[0].coords.split(".");
 
-    let obj = {};
+    let move = {};
 
-    obj[selectedPiece[0].piece] = {};
-    obj[selectedPiece[0].piece].row = rowTo;
-    obj[selectedPiece[0].piece].idx = idxTo;
+    move[selectedPiece[0].piece] = {};
+    move[selectedPiece[0].piece].row = +rowTo;
+    move[selectedPiece[0].piece].idx = +idxTo;
 
-    moves.push(obj);
+    moves.push(move);
 
-    setBoard((prevBoard) => {
-      let newBoard = prevBoard;
-      if (enPassant) {
-        newBoard[rowTo][idxTo] = selectedPiece[0].piece;
-        newBoard[rowFrom][idxTo] = 0;
-        newBoard[rowFrom][idxFrom] = 0;
-      } else {
-        newBoard[rowTo][idxTo] = selectedPiece[0].piece;
-        newBoard[rowFrom][idxFrom] = 0;
+    kingColor = turn == "white" ? "black" : "white";
+
+    let newBoard = JSON.parse(JSON.stringify(board));
+    if (enPassant) {
+      newBoard[rowTo][idxTo] = selectedPiece[0].piece;
+      newBoard[rowFrom][idxTo] = 0;
+      newBoard[rowFrom][idxFrom] = 0;
+    } else {
+      newBoard[rowTo][idxTo] = selectedPiece[0].piece;
+      newBoard[rowFrom][idxFrom] = 0;
+    }
+
+    if (piecesAttacking.length !== 0) {
+      identifier = turn == "white" ? "b" : "w";
+
+      piecesAttacking = isChecking(
+        newBoard,
+        kingsPosition[turn],
+        identifier,
+        pawnChecking,
+        moves,
+        2
+      );
+
+      if (piecesAttacking.length !== 0) {
+        resetPiece();
+        moves.pop();
+        piecesTaken[kingColor].pop();
+        console.log("invalid move!");
+        return;
       }
-      return [...newBoard];
-    });
+
+      changePawnChecking(false);
+    }
+
+    identifier = turn == "white" ? "w" : "b";
+
+    piecesAttacking = isChecking(
+      newBoard,
+      kingsPosition[kingColor],
+      identifier,
+      pawnChecking,
+      moves,
+      1
+    );
+
+    setBoard([...newBoard]);
 
     if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
       setEnPassant(false);
     }
 
-    setSelectedPiece((prevSelectedPiece) => {
-      let reset = prevSelectedPiece;
-      reset = [];
-      return reset;
-    });
+    resetPiece();
 
     changeTurns();
   }

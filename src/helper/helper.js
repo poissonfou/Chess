@@ -8,7 +8,7 @@ export function getCoords(event, coords) {
   };
 }
 
-export function setPiecesTaken(turn, final, piecesTaken) {
+export function setPiecesTaken(turn, final, board, piecesTaken) {
   turn == "white"
     ? piecesTaken.black.push(board[final.row][final.idx])
     : piecesTaken.white.push(board[final.row][final.idx]);
@@ -227,12 +227,13 @@ export function isChecking(
   kingsPosition,
   identifier,
   pawnChecking,
-  moves
+  moves,
+  sub
 ) {
   let start;
   let end;
   let piecesAttacking = [];
-  let pawn;
+  let pawn, pawnRow, pawnIdx;
   let idx;
 
   let identifierHook = identifier + "h";
@@ -242,11 +243,45 @@ export function isChecking(
   let identifierPawn = identifier + "p";
 
   //checking pawns
-  if (pawnChecking) {
-    idx = moves.length - 1;
-    pawn = moves[idx];
+  idx = moves.length - sub;
+  pawn = moves[idx];
+  if (pawnChecking && sub == 2) {
+    pawnRow = pawn[identifierPawn].row;
+    pawnIdx = pawn[identifierPawn].idx;
+
+    if (board[pawnRow][pawnIdx] == identifierPawn) {
+      if (identifierPawn == "bp") {
+        if (
+          board[pawnRow + 1][pawnIdx - 1] == "wk" ||
+          board[pawnRow + 1][pawnIdx + 1] == "wk"
+        ) {
+          piecesAttacking.push({
+            pawn: {
+              row: pawn[identifierPawn].row,
+              idx: pawn[identifierPawn].idx,
+            },
+          });
+        }
+      } else {
+        if (
+          board[pawnRow - 1][pawnIdx - 1] == "wk" ||
+          board[pawnRow - 1][pawnIdx + 1] == "wk"
+        ) {
+          piecesAttacking.push({
+            pawn: {
+              row: pawn[identifierPawn].row,
+              idx: pawn[identifierPawn].idx,
+            },
+          });
+        }
+      }
+    }
+  } else if (pawnChecking && sub == 1) {
     piecesAttacking.push({
-      pawn: { row: pawn[identifierPawn].row, idx: pawn[identifierPawn].idx },
+      pawn: {
+        row: pawn[identifierPawn].row,
+        idx: pawn[identifierPawn].idx,
+      },
     });
   }
 
@@ -261,6 +296,7 @@ export function isChecking(
         board[kingsPosition.row][i] == identifierHook ||
         board[kingsPosition.row][i] == identifierQueen
       ) {
+        console.log("bro wwhy", kingsPosition);
         start = i < kingsPosition.idx ? i : kingsPosition.idx;
         end = i > kingsPosition.idx ? i : kingsPosition.idx;
 
@@ -341,20 +377,5 @@ export function isChecking(
       break;
     }
   }
-
-  if (piecesAttacking.length) {
-    //do something
-    console.log("is checked", piecesAttacking);
-  }
-}
-
-export function checksIfCoveringCheck() {
-  //IDEIA: whenever a piece moves, we check if it attacks the oposite king on its new position;
-  //if it does, we set a variable to force it to move, and if there if a pice of the oposite in front,
-  //we save which piece and it's coordinates
-  //them we check that info here, and if the person is moving that piece out of the way without being able to take the
-  //pice that is thearthing the king, return false
-  //besides returning a boolean, we can return the coordinates for the valid move, to we check
-  //if that's waht the person is doing
-  //Remeber that more than one piece can threaten the king
+  return piecesAttacking;
 }
