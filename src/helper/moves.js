@@ -140,7 +140,7 @@ export function moveKing(
   return true;
 }
 
-export function moveQueen(initial, final, board, piecesTaken, piece) {
+export function moveQueen(turn, initial, final, board, piecesTaken, piece) {
   let isValid;
 
   if (final.row !== initial.row && final.idx !== initial.idx) {

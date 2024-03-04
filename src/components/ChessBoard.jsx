@@ -10,7 +10,7 @@ import {
   moveQueen,
 } from "../helper/moves";
 
-import { getCoords, isChecking } from "../helper/helper";
+import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
 
@@ -32,6 +32,7 @@ let enPassant = false;
 let identifier;
 let piecesAttacking = [];
 let kingColor;
+let checkMate;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
@@ -112,7 +113,7 @@ function ChessBoard() {
         return moveKnight(initial, final, piecesTaken, board, turn);
       }
       if (piece.includes("q")) {
-        return moveQueen(initial, final, board, piecesTaken, piece);
+        return moveQueen(turn, initial, final, board, piecesTaken, piece);
       }
       if (piece.includes("b")) {
         return moveBishop(initial, final, piecesTaken, board, turn, piece);
@@ -186,6 +187,19 @@ function ChessBoard() {
       identifier
     );
 
+    if (piecesAttacking.length) {
+      identifier = turn == "white" ? "b" : "w";
+
+      console.log(piecesAttacking);
+      checkMate = isCheckMate(
+        newBoard,
+        kingsPosition[kingColor],
+        identifier,
+        piecesAttacking,
+        enPassant
+      );
+    }
+
     setBoard([...newBoard]);
 
     if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
@@ -193,6 +207,12 @@ function ChessBoard() {
     }
 
     resetPiece();
+
+    if (checkMate) {
+      console.log("game ended");
+      setTurn("null");
+      return;
+    }
 
     changeTurns();
   }
