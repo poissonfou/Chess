@@ -173,28 +173,39 @@ function ChessBoard() {
       newBoard[rowFrom][idxFrom] = 0;
     }
 
+    identifier = turn == "white" ? "b" : "w";
+
+    piecesAttacking = isChecking(
+      newBoard,
+      kingsPosition[turn],
+      identifier,
+      pawnChecking,
+      moves,
+      2
+    );
+
+    console.log(piecesAttacking);
+
     if (piecesAttacking.length !== 0) {
-      identifier = turn == "white" ? "b" : "w";
-
-      piecesAttacking = isChecking(
-        newBoard,
-        kingsPosition[turn],
-        identifier,
-        pawnChecking,
-        moves,
-        2
-      );
-
-      if (piecesAttacking.length !== 0) {
-        resetPiece();
-        moves.pop();
-        piecesTaken[kingColor].pop();
-        console.log("invalid move!");
-        return;
-      }
-
-      changePawnChecking(false);
+      resetPiece();
+      moves.pop();
+      piecesTaken[kingColor].pop();
+      console.log("invalid move!");
+      return;
     }
+
+    changePawnChecking(false);
+
+    // piecesAttacking = isChecking(
+    //   newBoard,
+    //   kingsPosition[turn],
+    //   identifier,
+    //   pawnChecking,
+    //   moves,
+    //   _
+    // );
+
+    if (piecesAttacking.length) return;
 
     identifier = turn == "white" ? "w" : "b";
 

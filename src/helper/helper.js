@@ -243,6 +243,8 @@ export function isChecking(
   let identifierPawn = identifier + "p";
 
   //checking pawns
+  //Check for pawn check in this function, you have the info of the  kingsPosition,
+  //check that on the board, if it is white or black, and them do the calcs
   idx = moves.length - sub;
   pawn = moves[idx];
   if (pawnChecking && sub == 2) {
