@@ -222,69 +222,36 @@ export function checkHorses(direction, kingsPosition, board, identifierKnight) {
   };
 }
 
-export function isChecking(
-  board,
-  kingsPosition,
-  identifier,
-  pawnChecking,
-  moves,
-  sub
-) {
+export function isChecking(board, kingsPosition, identifier) {
   let start;
   let end;
   let piecesAttacking = [];
-  let pawn, pawnRow, pawnIdx;
-  let idx;
 
   let identifierHook = identifier + "h";
   let identifierQueen = identifier + "q";
   let identifierBishop = identifier + "b";
   let identifierKnight = identifier + "n";
-  let identifierPawn = identifier + "p";
 
   //checking pawns
-  //Check for pawn check in this function, you have the info of the  kingsPosition,
-  //check that on the board, if it is white or black, and them do the calcs
-  idx = moves.length - sub;
-  pawn = moves[idx];
-  if (pawnChecking && sub == 2) {
-    pawnRow = pawn[identifierPawn].row;
-    pawnIdx = pawn[identifierPawn].idx;
 
-    if (board[pawnRow][pawnIdx] == identifierPawn) {
-      if (identifierPawn == "bp") {
-        if (
-          board[pawnRow + 1][pawnIdx - 1] == "wk" ||
-          board[pawnRow + 1][pawnIdx + 1] == "wk"
-        ) {
-          piecesAttacking.push({
-            pawn: {
-              row: pawn[identifierPawn].row,
-              idx: pawn[identifierPawn].idx,
-            },
-          });
-        }
-      } else {
-        if (
-          board[pawnRow - 1][pawnIdx - 1] == "wk" ||
-          board[pawnRow - 1][pawnIdx + 1] == "wk"
-        ) {
-          piecesAttacking.push({
-            pawn: {
-              row: pawn[identifierPawn].row,
-              idx: pawn[identifierPawn].idx,
-            },
-          });
-        }
-      }
+  if (board[kingsPosition.row][kingsPosition.idx] == "wk") {
+    if (
+      board[kingsPosition.row - 1][kingsPosition.idx + 1] == "bp" ||
+      board[kingsPosition.row - 1][kingsPosition.idx - 1] == "bp"
+    ) {
+      piecesAttacking.push({
+        pawn: {},
+      });
     }
-  } else if (pawnChecking && sub == 1) {
-    piecesAttacking.push({
-      pawn: {
-        row: pawn[identifierPawn].row,
-        idx: pawn[identifierPawn].idx,
-      },
-    });
+  } else {
+    if (
+      board[kingsPosition.row + 1][kingsPosition.idx + 1] == "wp" ||
+      board[kingsPosition.row + 1][kingsPosition.idx - 1] == "wp"
+    ) {
+      piecesAttacking.push({
+        pawn: {},
+      });
+    }
   }
 
   //checking horizontal

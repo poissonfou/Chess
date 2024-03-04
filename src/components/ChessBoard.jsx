@@ -29,7 +29,6 @@ let piecesTaken = { white: [], black: [] };
 let moves = [];
 let kingsPosition = { white: { row: 7, idx: 4 }, black: { row: 0, idx: 4 } };
 let enPassant = false;
-let pawnChecking = false;
 let identifier;
 let piecesAttacking = [];
 let kingColor;
@@ -38,7 +37,6 @@ function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
-  // const [piecesTaken, setPiecesTaken] = useState({ white: [], black: [] });
 
   function resetPiece() {
     setSelectedPiece((prevSelectedPiece) => {
@@ -56,10 +54,6 @@ function ChessBoard() {
     }
     kingsPosition.black.row = final.row;
     kingsPosition.black.idx = final.idx;
-  }
-
-  function changePawnChecking(val) {
-    pawnChecking = val;
   }
 
   function setEnPassant(val) {
@@ -98,8 +92,7 @@ function ChessBoard() {
           piece,
           piecesTaken,
           enPassant,
-          setEnPassant,
-          changePawnChecking
+          setEnPassant
         );
       }
       if (piece.includes("k")) {
@@ -109,8 +102,6 @@ function ChessBoard() {
           board,
           turn,
           piecesTaken,
-          changePawnChecking,
-          pawnChecking,
           updateKingsPosition
         );
       }
@@ -175,16 +166,7 @@ function ChessBoard() {
 
     identifier = turn == "white" ? "b" : "w";
 
-    piecesAttacking = isChecking(
-      newBoard,
-      kingsPosition[turn],
-      identifier,
-      pawnChecking,
-      moves,
-      2
-    );
-
-    console.log(piecesAttacking);
+    piecesAttacking = isChecking(newBoard, kingsPosition[turn], identifier);
 
     if (piecesAttacking.length !== 0) {
       resetPiece();
@@ -194,17 +176,6 @@ function ChessBoard() {
       return;
     }
 
-    changePawnChecking(false);
-
-    // piecesAttacking = isChecking(
-    //   newBoard,
-    //   kingsPosition[turn],
-    //   identifier,
-    //   pawnChecking,
-    //   moves,
-    //   _
-    // );
-
     if (piecesAttacking.length) return;
 
     identifier = turn == "white" ? "w" : "b";
@@ -212,10 +183,7 @@ function ChessBoard() {
     piecesAttacking = isChecking(
       newBoard,
       kingsPosition[kingColor],
-      identifier,
-      pawnChecking,
-      moves,
-      1
+      identifier
     );
 
     setBoard([...newBoard]);

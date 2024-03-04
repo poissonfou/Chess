@@ -11,8 +11,7 @@ export function movePawn(
   piece,
   piecesTaken,
   enPassant,
-  setEnPassant,
-  changePawnChecking
+  setEnPassant
 ) {
   if (piece.includes("wp")) {
     if (final.row >= initial.row) {
@@ -31,22 +30,10 @@ export function movePawn(
               setEnPassant(true);
             }
           }
-          //check for king
-          if (
-            board[final.row - 1][final.idx - 1] == "bk" ||
-            board[final.row - 1][final.idx + 1] == "bk"
-          )
-            changePawnChecking(true);
           return true;
         }
         return false;
       }
-
-      if (
-        board[final.row - 1][final.idx - 1] == "bk" ||
-        board[final.row - 1][final.idx + 1] == "bk"
-      )
-        changePawnChecking(true);
 
       return final.row + 1 == initial.row;
     }
@@ -83,22 +70,11 @@ export function movePawn(
               setEnPassant(true);
             }
           }
-          if (
-            board[final.row + 1][final.idx - 1] == "wk" ||
-            board[final.row + 1][final.idx + 1] == "wk"
-          )
-            changePawnChecking(true);
 
           return true;
         }
         return false;
       }
-
-      if (
-        board[final.row + 1][final.idx - 1] == "wk" ||
-        board[final.row + 1][final.idx + 1] == "wk"
-      )
-        changePawnChecking(true);
 
       return final.row - 1 == initial.row;
     }
@@ -127,8 +103,6 @@ export function moveKing(
   board,
   turn,
   piecesTaken,
-  changePawnChecking,
-  pawnChecking,
   updateKingsPosition
 ) {
   if (initial.idx == final.idx) {
@@ -140,8 +114,6 @@ export function moveKing(
     }
 
     updateKingsPosition(turn, final);
-    //check for checks
-    if (pawnChecking) changePawnChecking(false);
     return true;
   }
   if (initial.row == final.row) {
@@ -153,8 +125,6 @@ export function moveKing(
     }
 
     updateKingsPosition(turn, final);
-    //check for checks
-    if (pawnChecking) changePawnChecking(false);
     return true;
   }
   if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
@@ -167,8 +137,6 @@ export function moveKing(
     setPiecesTaken(turn, final, board, piecesTaken);
   }
   updateKingsPosition(turn, final);
-  //check for checks
-  if (pawnChecking) changePawnChecking(false);
   return true;
 }
 
