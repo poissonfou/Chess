@@ -103,7 +103,10 @@ export function moveKing(
   board,
   turn,
   piecesTaken,
-  updateKingsPosition
+  kingsPosition,
+  updateKingsPosition,
+  hooksMoved,
+  updateCastle
 ) {
   if (initial.idx == final.idx) {
     if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
@@ -113,18 +116,38 @@ export function moveKing(
       setPiecesTaken(turn, final, board, piecesTaken);
     }
 
-    updateKingsPosition(turn, final);
+    updateKingsPosition(turn, final, true);
     return true;
   }
   if (initial.row == final.row) {
+    if (initial.row == 7 || initial.row == 0) {
+      console.log(kingsPosition);
+      if (!kingsPosition.hasMoved) {
+        if (final.idx + 2 == initial.idx) {
+          if (!hooksMoved[turn]["queenSide"]) {
+            updateKingsPosition(turn, final, true);
+            updateCastle(true, "queenSide");
+            return true;
+          }
+        }
+        if (final.idx - 2 == initial.idx) {
+          if (!hooksMoved[turn]["kingSide"]) {
+            updateKingsPosition(turn, final, true);
+            updateCastle(true, "kingSide");
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+
     if (final.idx + 1 !== initial.idx && final.idx - 1 !== initial.idx)
       return false;
     if (board[final.row][final.idx] !== 0) {
-      //check if taking is valid
       setPiecesTaken(turn, final, board, piecesTaken);
     }
 
-    updateKingsPosition(turn, final);
+    updateKingsPosition(turn, final, true);
     return true;
   }
   if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
@@ -136,7 +159,7 @@ export function moveKing(
     //check if taking is valid
     setPiecesTaken(turn, final, board, piecesTaken);
   }
-  updateKingsPosition(turn, final);
+  updateKingsPosition(turn, final, true);
   return true;
 }
 
@@ -158,10 +181,32 @@ export function moveQueen(turn, initial, final, board, piecesTaken, piece) {
   return false;
 }
 
-export function moveHook(initial, final, piecesTaken, board, turn) {
+export function moveHook(
+  initial,
+  final,
+  piecesTaken,
+  board,
+  turn,
+  hooksMoved,
+  updateHooksMoved
+) {
   if (final.idx !== initial.idx && final.row !== initial.row) return false;
 
   if (authVerticalAndHorizontal(board, initial, final)) {
+    if (initial.row == 7) {
+      if (initial.idx == 0 && !hooksMoved["white"]["queenSide"])
+        updateHooksMoved(turn, "queenSide", true);
+      if (initial.idx == 7 && !hooksMoved["white"]["kingSide"])
+        updateHooksMoved(turn, "kingSide", true);
+    }
+
+    if (initial.row == 0) {
+      if (initial.idx == 0 && !hooksMoved["black"]["queenSide"])
+        updateHooksMoved(turn, "queenSide", true);
+      if (initial.idx == 7 && !hooksMoved["black"]["kingSide"])
+        updateHooksMoved(turn, "kingSide", true);
+    }
+
     if (board[final.row][final.idx] !== 0) {
       setPiecesTaken(turn, final, board, piecesTaken);
     }

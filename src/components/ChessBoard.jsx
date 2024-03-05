@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import classes from "./ChessBoard.module.css";
 import {
@@ -9,6 +10,7 @@ import {
   moveKnight,
   moveQueen,
 } from "../helper/moves";
+import { movesActions } from "../store";
 
 import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
@@ -26,8 +28,15 @@ const arrBoard = [
 ];
 
 let piecesTaken = { white: [], black: [] };
-let moves = [];
-let kingsPosition = { white: { row: 7, idx: 4 }, black: { row: 0, idx: 4 } };
+let kingsPosition = {
+  white: { row: 7, idx: 4, hasMoved: false },
+  black: { row: 0, idx: 4, hasMoved: false },
+};
+let hooksMoved = {
+  white: { queenSide: false, kingSide: false },
+  black: { queenSide: false, kingSide: false },
+};
+let castle = { isCastling: false, side: null };
 let enPassant = false;
 let identifier;
 let piecesAttacking = [];
@@ -38,6 +47,7 @@ function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
+  const dispatch = useDispatch();
 
   function resetPiece() {
     setSelectedPiece((prevSelectedPiece) => {
@@ -47,14 +57,27 @@ function ChessBoard() {
     });
   }
 
-  function updateKingsPosition(turn, final) {
-    if (turn == "white") {
-      kingsPosition.white.row = final.row;
-      kingsPosition.white.idx = final.idx;
-      return;
+  const dispatchAction = (action, ...move) => {
+    if (action == "push") {
+      dispatch(movesActions.push(move));
+    } else {
+      dispatch(movesActions.pop());
     }
-    kingsPosition.black.row = final.row;
-    kingsPosition.black.idx = final.idx;
+  };
+
+  function updateKingsPosition(turn, final, hasMoved) {
+    kingsPosition[turn].row = final.row;
+    kingsPosition[turn].idx = final.idx;
+    kingsPosition[turn].hasMoved = hasMoved;
+  }
+
+  function updateHooksMoved(turn, side, hasMoved) {
+    hooksMoved[turn][side] = hasMoved;
+  }
+
+  function updateCastle(isCastling, side) {
+    castle.isCastling = isCastling;
+    castle.side = side;
   }
 
   function setEnPassant(val) {
@@ -103,11 +126,22 @@ function ChessBoard() {
           board,
           turn,
           piecesTaken,
-          updateKingsPosition
+          kingsPosition[turn],
+          updateKingsPosition,
+          hooksMoved,
+          updateCastle
         );
       }
       if (piece.includes("h")) {
-        return moveHook(initial, final, piecesTaken, board, turn);
+        return moveHook(
+          initial,
+          final,
+          piecesTaken,
+          board,
+          turn,
+          hooksMoved,
+          updateHooksMoved
+        );
       }
       if (piece.includes("n")) {
         return moveKnight(initial, final, piecesTaken, board, turn);
@@ -145,13 +179,12 @@ function ChessBoard() {
     let [rowTo, idxTo] = event.target.id.split(".");
     let [rowFrom, idxFrom] = selectedPiece[0].coords.split(".");
 
-    let move = {};
+    let move = [];
+    move.push(selectedPiece[0].piece);
+    move.push(+rowTo);
+    move.push(+idxTo);
 
-    move[selectedPiece[0].piece] = {};
-    move[selectedPiece[0].piece].row = +rowTo;
-    move[selectedPiece[0].piece].idx = +idxTo;
-
-    moves.push(move);
+    dispatchAction("push", move);
 
     kingColor = turn == "white" ? "black" : "white";
 
@@ -160,6 +193,16 @@ function ChessBoard() {
       newBoard[rowTo][idxTo] = selectedPiece[0].piece;
       newBoard[rowFrom][idxTo] = 0;
       newBoard[rowFrom][idxFrom] = 0;
+    } else if (castle.isCastling) {
+      newBoard[rowTo][idxTo] = selectedPiece[0].piece;
+      newBoard[rowFrom][idxFrom] = 0;
+      if (castle.side == "kingSide") {
+        newBoard[rowTo][+idxTo - 1] = turn == "white" ? "wh" : "bh";
+        newBoard[rowTo][+idxTo + 1] = 0;
+      } else {
+        newBoard[rowTo][+idxTo + 1] = turn == "white" ? "wh" : "bh";
+        newBoard[rowTo][+idxTo - 2] = 0;
+      }
     } else {
       newBoard[rowTo][idxTo] = selectedPiece[0].piece;
       newBoard[rowFrom][idxFrom] = 0;
@@ -171,7 +214,7 @@ function ChessBoard() {
 
     if (piecesAttacking.length !== 0) {
       resetPiece();
-      moves.pop();
+      dispatchAction("pop");
       piecesTaken[kingColor].pop();
       console.log("invalid move!");
       return;
@@ -218,7 +261,7 @@ function ChessBoard() {
   }
 
   return (
-    <div>
+    <div className={classes.board}>
       <div className={classes["board-nums"]}>
         <span>8</span>
         <span>7</span>
@@ -229,7 +272,7 @@ function ChessBoard() {
         <span>2</span>
         <span>1</span>
       </div>
-      <div className={classes.board}>
+      <div>
         {arrBoard.map((_, idx) => (
           <BoardRow
             key={idx}
