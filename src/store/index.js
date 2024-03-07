@@ -7,7 +7,11 @@ let timer = {
   forceRenderWhite: 5,
   black: false,
   forceRenderBlack: 2,
-  time: -1,
+  time: {
+    minutes: 600000,
+    seconds: 0,
+    increment: 0,
+  },
 };
 
 const movesSlice = createSlice({
@@ -50,7 +54,9 @@ const timerSlice = createSlice({
       }
     },
     setTime(state, action) {
-      state.time = action.payload;
+      state.time.minutes = action.payload.minutes;
+      state.time.seconds = action.payload.seconds;
+      state.time.increment = action.payload.increment;
     },
     changeKeys(state) {
       state.forceRenderWhite = state.forceRenderWhite + 1;

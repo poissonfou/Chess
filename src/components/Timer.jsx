@@ -13,24 +13,35 @@ let date;
 
 function Timer({ isActive }) {
   let dispatch = useDispatch();
-  let timeLimit = useSelector((state) => state.timer.time);
-  const [timer, setTimer] = useState(timeLimit);
+  let minutesMiliseconds = useSelector((state) => state.timer.time.minutes);
+  let secondsInput = useSelector((state) => state.timer.time.seconds);
+  let increment = useSelector((state) => state.timer.time.increment);
+  const [timer, setTimer] = useState(minutesMiliseconds + secondsInput);
   let deadline;
 
   miliseconds = JSON.parse(JSON.stringify(timer));
 
   seconds = miliseconds / 1000;
   minutes = seconds / 60;
-
+  if (increment) {
+    increment = increment * 1000;
+  }
+  console.log(seconds);
   date = new Date();
   date.setSeconds(seconds);
   date.setMinutes(minutes);
 
   seconds = date.getSeconds();
+  console.log(seconds);
   minutes = date.getMinutes();
+
+  console.log(minutes, seconds);
 
   function getTime() {
     newTime = timer - 1000;
+    if (increment !== 0) {
+      newTime += increment;
+    }
     clearInterval(deadline);
     setTimer(newTime);
   }

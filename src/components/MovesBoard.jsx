@@ -1,28 +1,97 @@
 import classes from "./MovesBoard.module.css";
+import arrow from "../assets/arrow-right-short.svg";
 
 import { useSelector, useDispatch } from "react-redux";
 import { turnActions, timerActions } from "../store";
+import { useState, useRef } from "react";
 
 function MovesBoard() {
+  const [selectedTime, setSelectedTime] = useState("10:00");
+  const [dropdown, setDropdown] = useState(false);
+  const [validInput, setvalidInput] = useState(true);
+  let minutesRef = useRef(0);
+  let secondsRef = useRef(0);
+  let incrementRef = useRef(0);
+
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
   let dispatch = useDispatch();
   let movesBlack = [];
+  let movesWhite = [];
+
+  function authInput(event) {
+    let isNumber;
+    if (event.target.name == "minutes") {
+      let val = minutesRef.current.value;
+      isNumber = val == "" ? true : /^[0-9]+$/.test(val);
+    }
+
+    if (event.target.name == "seconds") {
+      let val = secondsRef.current.value;
+      isNumber = val == "" ? true : /^[0-9]+$/.test(val);
+    }
+
+    if (event.target.name == "increment") {
+      let val = incrementRef.current.value;
+      isNumber = val == "" ? true : /^[0-9]+$/.test(val);
+    }
+
+    setvalidInput(isNumber);
+  }
 
   function setGame(event) {
     event.preventDefault();
-    const fd = new FormData(event.target);
-    const data = Object.fromEntries(fd.entries());
 
-    let timer = +data.time * 60000;
-
-    dispatch(timerActions.setTime(timer));
     dispatch(timerActions.setRunningTimer("white"));
     dispatch(timerActions.changeKeys());
     dispatch(turnActions.changeTurn("white"));
   }
 
-  let movesWhite = moves.filter((move) => {
+  function showOptions() {
+    setDropdown((prevDropdown) => {
+      return !prevDropdown;
+    });
+  }
+
+  function setTimer(event) {
+    let time;
+    let minutes;
+    let seconds;
+    let increment;
+    let timeSelected;
+    if (event !== undefined) {
+      time = event.target.id.split(".");
+      minutes = +time[0];
+      seconds = 0;
+      increment = +time[1];
+      timeSelected = event.target.innerHTML;
+    } else {
+      minutes = +minutesRef.current.value;
+      seconds = +secondsRef.current.value;
+      increment = +incrementRef.current.value;
+      if (seconds < 10) seconds = "0" + seconds;
+      if (!seconds && increment) {
+        timeSelected = minutes + "|" + increment;
+      } else if (seconds && !increment) {
+        timeSelected = minutes + ":" + seconds;
+      } else {
+        timeSelected = minutes + ":" + seconds + "|" + increment;
+      }
+      seconds = +secondsRef.current.value;
+    }
+
+    if (minutes == 0 && seconds == 0) return;
+
+    minutes = minutes * 60000;
+    seconds = +secondsRef.current.value * 1000;
+
+    dispatch(timerActions.setTime({ minutes, seconds, increment }));
+    dispatch(timerActions.changeKeys());
+    setSelectedTime(timeSelected);
+    setDropdown(false);
+  }
+
+  movesWhite = moves.filter((move) => {
     let key = move[0];
     return key[0].includes("w");
   });
@@ -35,20 +104,104 @@ function MovesBoard() {
   return (
     <div>
       {turn == null && (
-        <div className={classes["start-game-div"]}>
+        <div
+          className={
+            dropdown
+              ? `${classes["start-game-div"]} ${classes.overflow}`
+              : classes["start-game-div"]
+          }
+        >
           <form onSubmit={setGame}>
             <div>
-              <label htmlFor="time">Chose the time:</label>
-              <select name="time" id="time">
-                <option value="1">1 min.</option>
-                <option value="2">2 min.</option>
-                <option value="3">3 min.</option>
-                <option value="10">10 min.</option>
-                <option value="15">15 min.</option>
-                <option value="30">30 min.</option>
-              </select>
+              <button
+                onClick={showOptions}
+                type="button"
+                className={
+                  dropdown
+                    ? `${classes["selected-time"]} ${classes["selected-time-overflow"]}`
+                    : classes["selected-time"]
+                }
+              >
+                {selectedTime}
+              </button>
+              {dropdown && (
+                <div className={classes["dropdown"]}>
+                  <div>
+                    <p>Bullet</p>
+                    <div className={classes["dropdown-options"]}>
+                      <button id="1.0" onClick={setTimer} type="button">
+                        1 min
+                      </button>
+                      <button id="1.1" onClick={setTimer} type="button">
+                        1|1
+                      </button>
+                      <button id="1.2" onClick={setTimer} type="button">
+                        1|2
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p>Blitz</p>
+                    <div className={classes["dropdown-options"]}>
+                      <button id="3.0" onClick={setTimer} type="button">
+                        3 min
+                      </button>
+                      <button id="3.2" onClick={setTimer} type="button">
+                        3|2
+                      </button>
+                      <button id="5.0" onClick={setTimer} type="button">
+                        5 min
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p>Rapid</p>
+                    <div className={classes["dropdown-options"]}>
+                      <button id="10.0" onClick={setTimer} type="button">
+                        10 min
+                      </button>
+                      <button id="15.10" onClick={setTimer} type="button">
+                        15|10
+                      </button>
+                      <button id="30.0" onClick={setTimer} type="button">
+                        30 min
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <p>Custom</p>
+                    {validInput == false && <p>Please enter only numbers</p>}
+                    <div className={classes.inputs}>
+                      <input
+                        name="minutes"
+                        ref={minutesRef}
+                        type="text"
+                        onChange={authInput}
+                        placeholder="minutes"
+                      />
+                      <input
+                        name="seconds"
+                        ref={secondsRef}
+                        type="text"
+                        onChange={authInput}
+                        placeholder="seconds"
+                      />
+                      <input
+                        name="increment"
+                        ref={incrementRef}
+                        onChange={authInput}
+                        type="text"
+                        placeholder="increment"
+                      />
+                      <button onClick={() => setTimer()} type="button">
+                        <img src={arrow} alt="arrow icon" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <button>Play</button>
+            <button className={classes["play-button"]}>Play</button>
           </form>
         </div>
       )}

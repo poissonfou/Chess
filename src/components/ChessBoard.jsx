@@ -244,6 +244,12 @@ function ChessBoard() {
       );
     }
 
+    if (turn == "white") {
+      dispatch(timerActions.setRunningTimer("black"));
+    } else {
+      dispatch(timerActions.setRunningTimer("white"));
+    }
+
     setBoard([...newBoard]);
 
     if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
@@ -257,12 +263,6 @@ function ChessBoard() {
       dispatch(turnActions.changeTurn(null));
       dispatch(timerActions.setRunningTimer(null));
       return;
-    }
-
-    if (turn == "white") {
-      dispatch(timerActions.setRunningTimer("black"));
-    } else {
-      dispatch(timerActions.setRunningTimer("white"));
     }
 
     dispatchTurn();
