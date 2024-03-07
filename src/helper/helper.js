@@ -237,8 +237,6 @@ export function isChecking(board, kingsPosition, identifier) {
   let identifierKnight = identifier + "n";
 
   //checking pawns
-
-  console.log(board[kingsPosition.row][kingsPosition.idx]);
   piece = board[kingsPosition.row][kingsPosition.idx];
 
   if (piece.indexOf("w") !== -1) {

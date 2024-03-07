@@ -10,7 +10,7 @@ import {
   moveKnight,
   moveQueen,
 } from "../helper/moves";
-import { movesActions } from "../store";
+import { movesActions, turnActions, timerActions } from "../store";
 
 import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
@@ -45,9 +45,9 @@ let checkMate;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
-  const [turn, setTurn] = useState("white");
   const [selectedPiece, setSelectedPiece] = useState([]);
   const dispatch = useDispatch();
+  let turn = useSelector((state) => state.turn.turn);
 
   function resetPiece() {
     setSelectedPiece((prevSelectedPiece) => {
@@ -57,7 +57,7 @@ function ChessBoard() {
     });
   }
 
-  const dispatchAction = (action, ...move) => {
+  const dispatchMove = (action, ...move) => {
     if (action == "push") {
       dispatch(movesActions.push(move));
     } else {
@@ -84,11 +84,12 @@ function ChessBoard() {
     enPassant = val;
   }
 
-  function changeTurns() {
-    setTurn((prevTurn) => {
-      if (prevTurn == "white") return "black";
-      return "white";
-    });
+  function dispatchTurn() {
+    if (turn == "white") {
+      dispatch(turnActions.changeTurn("black"));
+    } else {
+      dispatch(turnActions.changeTurn("white"));
+    }
   }
 
   function authMove(event, color, [{ coords, piece }]) {
@@ -184,7 +185,7 @@ function ChessBoard() {
     move.push(+rowTo);
     move.push(+idxTo);
 
-    dispatchAction("push", move);
+    dispatchMove("push", move);
 
     kingColor = turn == "white" ? "black" : "white";
 
@@ -214,7 +215,7 @@ function ChessBoard() {
 
     if (piecesAttacking.length !== 0) {
       resetPiece();
-      dispatchAction("pop");
+      dispatchMove("pop");
       piecesTaken[kingColor].pop();
       console.log("invalid move!");
       return;
@@ -253,11 +254,18 @@ function ChessBoard() {
 
     if (checkMate) {
       console.log("game ended");
-      setTurn("null");
+      dispatch(turnActions.changeTurn(null));
+      dispatch(timerActions.setRunningTimer(null));
       return;
     }
 
-    changeTurns();
+    if (turn == "white") {
+      dispatch(timerActions.setRunningTimer("black"));
+    } else {
+      dispatch(timerActions.setRunningTimer("white"));
+    }
+
+    dispatchTurn();
   }
 
   return (

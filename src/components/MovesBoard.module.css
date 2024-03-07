@@ -9,6 +9,63 @@
   overflow-y: scroll;
 }
 
+.start-game-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 25rem;
+  height: 30rem;
+  margin-top: 3rem;
+  margin-left: -5rem;
+  border-radius: 5px;
+  background-color: rgba(116, 115, 115, 0.2);
+}
+
+.start-game-div div {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  margin-bottom: 2rem;
+  margin-left: 6.2rem;
+}
+
+.start-game-div label {
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.start-game-div select {
+  font-size: 1.5rem;
+  border-color: rgb(44, 44, 44);
+  border-radius: 5px;
+  background-color: rgba(116, 115, 115, 0.2);
+  height: 3rem;
+}
+
+.start-game.div select:focus {
+  outline: none;
+}
+
+.start-game-div button {
+  width: 15rem;
+  height: 3.5rem;
+  position: relative;
+  margin-left: 5rem;
+  border-width: 0.2;
+  border-style: solid;
+  border-radius: 10px;
+  box-shadow: 0px 4px rgb(56, 56, 56);
+  border-color: rgb(44, 44, 44);
+  background-color: rgb(17, 124, 17);
+  font-size: 2rem;
+  color: white;
+}
+
+.start-game-div button:hover {
+  cursor: pointer;
+}
+
 .board::-webkit-scrollbar {
   width: 10px;
   display: block;
