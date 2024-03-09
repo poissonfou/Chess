@@ -18,7 +18,6 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
   let color;
   let tooltip;
   let promotingState = useSelector((state) => state.promotingPiece);
-  console.log(promotingState);
   let showTooltip = false;
 
   if (row == 0 && promotingState.idx !== null) {

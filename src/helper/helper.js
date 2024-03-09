@@ -390,16 +390,44 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   let finalKingRow;
 
   let kingIdx = kingsPosition.idx - 1;
-  let finalKingIdx = kingIdx + 2;
+  let finalKingIdx = kingIdx + 3;
 
   //checking if king can move
+
+  if (kingsPosition.row == 0 && kingsPosition.idx == 4) {
+    kingRow = kingsPosition.row + 1;
+    finalKingRow = kingRow - 2;
+
+    for (let j = kingRow; j > finalKingRow; j--) {
+      for (let i = kingIdx; i < finalKingIdx; i++) {
+        console.log(board[j][i]);
+        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+        if (board[j][i] == undefined) continue;
+        if (board[j][i].includes(identifier) || board[j][i] == 0) {
+          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
+          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
+
+          newKingsPosition.row = j;
+          newKingsPosition.idx = i;
+
+          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
+          console.log("here", newKingsPosition);
+
+          newBoard = JSON.parse(JSON.stringify(board));
+
+          if (piecesAttacking.length) {
+            continue;
+          }
+
+          return false;
+        }
+      }
+    }
+  }
 
   if (kingsPosition.row == 7 && kingsPosition.idx == 4) {
     kingRow = kingsPosition.row - 1;
     finalKingRow = kingRow + 2;
-  } else if (kingsPosition.row == 0 && kingsPosition.idx == 4) {
-    kingRow = kingsPosition.row + 1;
-    finalKingRow = kingRow - 2;
   } else {
     kingRow = kingsPosition.row + 1;
     finalKingRow = kingRow + 2;
@@ -408,7 +436,8 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   for (let j = kingRow; j < finalKingRow; j++) {
     for (let i = kingIdx; i < finalKingIdx; i++) {
       if (j == kingsPosition.row && i == kingsPosition.idx) continue;
-      if (board[j][i] !== undefined && board[j][i] == 0) {
+      if (board[j][i] == undefined) continue;
+      if (board[j][i].includes(identifier) || board[j][i] == 0) {
         newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
         newBoard[kingsPosition.row][kingsPosition.idx] = 0;
 
@@ -423,7 +452,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
           continue;
         }
 
-        possibleMoves.push({ idx: i, row: j });
+        return false;
       }
     }
   }
