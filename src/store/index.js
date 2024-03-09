@@ -13,6 +13,7 @@ let timer = {
     increment: 0,
   },
 };
+let promotingPiece = { idx: null, row: null, idxFrom: null };
 
 const movesSlice = createSlice({
   name: "moves",
@@ -65,14 +66,28 @@ const timerSlice = createSlice({
   },
 });
 
+const promotingPieceSlice = createSlice({
+  name: "promotingPiece",
+  initialState: promotingPiece,
+  reducers: {
+    setPiece(state, action) {
+      state.row = action.payload.row;
+      state.idx = action.payload.idx;
+      state.idxFrom = action.payload.idxFrom;
+    },
+  },
+});
+
 export const store = configureStore({
   reducer: {
     moves: movesSlice.reducer,
     turn: turnSlice.reducer,
     timer: timerSlice.reducer,
+    promotingPiece: promotingPieceSlice.reducer,
   },
 });
 
 export const movesActions = movesSlice.actions;
 export const turnActions = turnSlice.actions;
 export const timerActions = timerSlice.actions;
+export const promotingPieceActions = promotingPieceSlice.actions;

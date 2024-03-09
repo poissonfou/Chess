@@ -210,7 +210,7 @@ function MovesBoard() {
             <h1>Moves</h1>
             <div
               className={
-                movesWhite.length > 5
+                movesWhite.length > 4
                   ? `${classes.moves} ${classes.overflow}`
                   : `${classes.moves}`
               }

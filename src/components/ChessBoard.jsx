@@ -10,7 +10,12 @@ import {
   moveKnight,
   moveQueen,
 } from "../helper/moves";
-import { movesActions, turnActions, timerActions } from "../store";
+import {
+  movesActions,
+  turnActions,
+  timerActions,
+  promotingPieceActions,
+} from "../store";
 
 import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
@@ -44,12 +49,51 @@ let kingColor;
 let checkMate;
 let boardLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
+let promoting = false;
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
   const [selectedPiece, setSelectedPiece] = useState([]);
   const dispatch = useDispatch();
   let turn = useSelector((state) => state.turn.turn);
+  let promotingPiece = useSelector((state) => state.promotingPiece);
+
+  function promotePiece(piece) {
+    let newBoard = JSON.parse(JSON.stringify(board));
+
+    newBoard[promotingPiece.row][promotingPiece.idx] = piece;
+
+    let move = [];
+    move.push(piece);
+
+    if (board[promotingPiece.row][promotingPiece.idx] == 0) {
+      move.push(boardLetters[promotingPiece.idx]);
+      move.push(boardNumber[promotingPiece.row] + "=" + piece[1].toUpperCase());
+    } else {
+      move.push(boardLetters[promotingPiece.idxFrom]);
+      let pieceTaken =
+        "x" +
+        boardLetters[promotingPiece.idx] +
+        boardNumber[promotingPiece.row];
+      move.push(pieceTaken + "=" + piece[1].toUpperCase());
+    }
+
+    setBoard([...newBoard]);
+
+    dispatchMove("push", move);
+
+    if (turn == "white") {
+      dispatch(timerActions.setRunningTimer("black"));
+    } else {
+      dispatch(timerActions.setRunningTimer("white"));
+    }
+
+    dispatch(
+      promotingPieceActions.setPiece({ idx: null, row: null, idxFrom: null })
+    );
+
+    dispatchTurn();
+  }
 
   function resetPiece() {
     setSelectedPiece((prevSelectedPiece) => {
@@ -182,19 +226,29 @@ function ChessBoard() {
     let [rowTo, idxTo] = event.target.id.split(".");
     let [rowFrom, idxFrom] = selectedPiece[0].coords.split(".");
 
-    let move = [];
-    move.push(selectedPiece[0].piece);
-
-    if (board[rowTo][idxTo] == 0) {
-      move.push(boardLetters[idxTo]);
-      move.push(boardNumber[rowTo]);
-    } else {
-      move.push(boardLetters[idxFrom]);
-      let pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
-      move.push(pieceTaken);
+    if (selectedPiece[0].piece.includes("wp") && rowTo == 0) {
+      promoting = true;
     }
 
-    dispatchMove("push", move);
+    if (selectedPiece[0].piece.includes("bp") && rowTo == 7) {
+      promoting = true;
+    }
+
+    if (promoting == false) {
+      let move = [];
+      move.push(selectedPiece[0].piece);
+
+      if (board[rowTo][idxTo] == 0) {
+        move.push(boardLetters[idxTo]);
+        move.push(boardNumber[rowTo]);
+      } else {
+        move.push(boardLetters[idxFrom]);
+        let pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
+        move.push(pieceTaken);
+      }
+
+      dispatchMove("push", move);
+    }
 
     kingColor = turn == "white" ? "black" : "white";
 
@@ -267,6 +321,19 @@ function ChessBoard() {
       return;
     }
 
+    if (promoting) {
+      console.log("we are here");
+      promoting = false;
+      dispatch(
+        promotingPieceActions.setPiece({
+          row: +rowTo,
+          idx: +idxTo,
+          idxFrom: idxFrom,
+        })
+      );
+      return;
+    }
+
     if (turn == "white") {
       dispatch(timerActions.setRunningTimer("black"));
     } else {
@@ -295,6 +362,7 @@ function ChessBoard() {
             dark={idx % 2 !== 0}
             rowData={board[idx]}
             row={+idx}
+            promotePiece={promotePiece}
             onClick={handleMove}
           />
         ))}
