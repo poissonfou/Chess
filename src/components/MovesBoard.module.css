@@ -1,12 +1,24 @@
 .board {
-  display: flex;
-  flex-direction: row;
   background-color: rgba(116, 115, 115, 0.2);
   width: 22rem;
   height: 25rem;
-  margin-top: 2rem;
-  margin-left: -5rem;
-  overflow-y: scroll;
+  margin-top: 5.5rem;
+  margin-left: -15rem;
+  border-radius: 5px;
+}
+
+.moves {
+  display: flex;
+  flex-direction: row;
+  width: 22rem;
+  height: 21rem;
+}
+
+.board h1 {
+  color: white;
+  margin-left: 8rem;
+  padding-top: 1rem;
+  margin-bottom: 0rem;
 }
 
 .start-game-div {
@@ -138,20 +150,30 @@
   border-radius: 5px;
 }
 
-.board ol,
-.board ul {
+.board p:last-child {
   color: white;
+  margin-top: 1.7rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
 }
 
-.board ul {
-  list-style: none;
-}
-
-.board ol div,
-.board ul div {
-  width: 2rem;
-  height: 2rem;
+.piece {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 1.5rem;
   background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.log-entry {
+  display: flex;
+  flex-direction: row;
+  margin-left: 2rem;
+}
+
+.number {
+  font-size: 1.5rem;
+  color: white;
 }
 
 .bp {

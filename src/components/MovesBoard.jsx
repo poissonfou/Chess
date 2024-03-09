@@ -67,9 +67,9 @@ function MovesBoard() {
       timeSelected = event.target.innerHTML;
     } else {
       minutes = +minutesRef.current.value;
-      seconds = +secondsRef.current.value;
+      seconds = +secondsRef.current.value !== "" ? secondsRef.current.value : 0;
       increment = +incrementRef.current.value;
-      if (seconds < 10) seconds = "0" + seconds;
+      if (seconds < 10) seconds = "0" + +seconds;
       if (!seconds && increment) {
         timeSelected = minutes + "|" + increment;
       } else if (seconds && !increment) {
@@ -77,7 +77,6 @@ function MovesBoard() {
       } else {
         timeSelected = minutes + ":" + seconds + "|" + increment;
       }
-      seconds = +secondsRef.current.value;
     }
 
     if (minutes == 0 && seconds == 0) return;
@@ -206,30 +205,55 @@ function MovesBoard() {
         </div>
       )}
       {turn !== null && (
-        <div className={classes.board}>
-          {movesWhite.length > 0 && (
-            <ol>
-              {movesWhite.map((move, index) => (
-                <li key={index}>
-                  <div className={classes[move[0][0]]}></div>
-                  {move[0][1]}
-                  {move[0][2]}
-                </li>
-              ))}
-            </ol>
-          )}
+        <div>
+          <div className={classes.board}>
+            <h1>Moves</h1>
+            <div
+              className={
+                movesWhite.length > 5
+                  ? `${classes.moves} ${classes.overflow}`
+                  : `${classes.moves}`
+              }
+            >
+              {movesWhite.length > 0 && (
+                <div>
+                  {movesWhite.map((move, index) => (
+                    <div key={index} className={classes["log-entry"]}>
+                      <p className={classes.number}>{index + 1 + " - "}</p>
+                      <div
+                        className={`${classes[move[0][0]]} ${
+                          classes["piece"]
+                        } `}
+                      ></div>
+                      <p>
+                        {move[0][1]}
+                        {move[0][2]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {movesBlack.length > 0 && (
-            <ul>
-              {movesBlack.map((move, index) => (
-                <li key={index}>
-                  <div className={classes[move[0][0]]}></div>
-                  {move[0][1]}
-                  {move[0][2]}
-                </li>
-              ))}
-            </ul>
-          )}
+              {movesBlack.length > 0 && (
+                <div>
+                  {movesBlack.map((move, index) => (
+                    <div key={index} className={classes["log-entry"]}>
+                      <p className={`${classes.number}`}>{index + 1 + " - "}</p>
+                      <div
+                        className={`${classes[move[0][0]]} ${
+                          classes["piece"]
+                        } `}
+                      ></div>
+                      <p>
+                        {move[0][1]}
+                        {move[0][2]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

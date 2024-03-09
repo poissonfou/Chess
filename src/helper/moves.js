@@ -112,7 +112,6 @@ export function moveKing(
     if (final.row + 1 !== initial.row && final.row - 1 !== initial.row)
       return false;
     if (board[final.row][final.idx] !== 0) {
-      //check if taking is valid
       setPiecesTaken(turn, final, board, piecesTaken);
     }
 
@@ -121,7 +120,6 @@ export function moveKing(
   }
   if (initial.row == final.row) {
     if (initial.row == 7 || initial.row == 0) {
-      console.log(kingsPosition);
       if (!kingsPosition.hasMoved) {
         if (final.idx + 2 == initial.idx) {
           if (!hooksMoved[turn]["queenSide"]) {

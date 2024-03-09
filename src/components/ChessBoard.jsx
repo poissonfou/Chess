@@ -42,6 +42,8 @@ let identifier;
 let piecesAttacking = [];
 let kingColor;
 let checkMate;
+let boardLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 
 function ChessBoard() {
   const [board, setBoard] = useState(arrBoard);
@@ -182,8 +184,15 @@ function ChessBoard() {
 
     let move = [];
     move.push(selectedPiece[0].piece);
-    move.push(+rowTo);
-    move.push(+idxTo);
+
+    if (board[rowTo][idxTo] == 0) {
+      move.push(boardLetters[idxTo]);
+      move.push(boardNumber[rowTo]);
+    } else {
+      move.push(boardLetters[idxFrom]);
+      let pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
+      move.push(pieceTaken);
+    }
 
     dispatchMove("push", move);
 
@@ -204,6 +213,8 @@ function ChessBoard() {
         newBoard[rowTo][+idxTo + 1] = turn == "white" ? "wh" : "bh";
         newBoard[rowTo][+idxTo - 2] = 0;
       }
+      castle.isCastling = false;
+      castle.side = null;
     } else {
       newBoard[rowTo][idxTo] = selectedPiece[0].piece;
       newBoard[rowFrom][idxFrom] = 0;
@@ -216,12 +227,10 @@ function ChessBoard() {
     if (piecesAttacking.length !== 0) {
       resetPiece();
       dispatchMove("pop");
-      piecesTaken[kingColor].pop();
+      if (board[rowTo][idxTo] !== 0) piecesTaken[kingColor].pop();
       console.log("invalid move!");
       return;
     }
-
-    if (piecesAttacking.length) return;
 
     identifier = turn == "white" ? "w" : "b";
 
@@ -232,9 +241,8 @@ function ChessBoard() {
     );
 
     if (piecesAttacking.length) {
-      identifier = turn == "white" ? "b" : "w";
+      identifier = turn == "white" ? "w" : "b";
 
-      console.log(piecesAttacking);
       checkMate = isCheckMate(
         newBoard,
         kingsPosition[kingColor],
@@ -242,12 +250,6 @@ function ChessBoard() {
         piecesAttacking,
         enPassant
       );
-    }
-
-    if (turn == "white") {
-      dispatch(timerActions.setRunningTimer("black"));
-    } else {
-      dispatch(timerActions.setRunningTimer("white"));
     }
 
     setBoard([...newBoard]);
@@ -263,6 +265,12 @@ function ChessBoard() {
       dispatch(turnActions.changeTurn(null));
       dispatch(timerActions.setRunningTimer(null));
       return;
+    }
+
+    if (turn == "white") {
+      dispatch(timerActions.setRunningTimer("black"));
+    } else {
+      dispatch(timerActions.setRunningTimer("white"));
     }
 
     dispatchTurn();

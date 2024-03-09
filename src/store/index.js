@@ -22,7 +22,7 @@ const movesSlice = createSlice({
       state.moves.push(action.payload);
     },
     pop(state) {
-      state.pop();
+      state.moves.pop();
     },
   },
 });

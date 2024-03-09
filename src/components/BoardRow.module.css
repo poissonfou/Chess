@@ -73,6 +73,10 @@
   background-image: url("../assets/whiteKing.png");
 }
 
+:where(.bp, .bh, .bn, .bb, .bq, .bk, .wp, .wh, .wn, .wb, .wq, .wk) {
+  background-repeat: no-repeat;
+}
+
 :where(.bp, .bh, .bn, .bb, .bq, .bk, .wp, .wh, .wn, .wb, .wq, .wk):hover {
   cursor: pointer;
 }
