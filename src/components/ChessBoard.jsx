@@ -345,16 +345,16 @@ function ChessBoard() {
 
   return (
     <div className={classes.board}>
-      <div className={classes["board-nums"]}>
-        <span>8</span>
-        <span>7</span>
-        <span>6</span>
-        <span>5</span>
-        <span>4</span>
-        <span>3</span>
-        <span>2</span>
-        <span>1</span>
-      </div>
+      <ul className={classes["board-nums"]}>
+        <li>8</li>
+        <li>7</li>
+        <li>6</li>
+        <li>5</li>
+        <li>4</li>
+        <li>3</li>
+        <li>2</li>
+        <li>1</li>
+      </ul>
       <div>
         {arrBoard.map((_, idx) => (
           <BoardRow
@@ -367,16 +367,16 @@ function ChessBoard() {
           />
         ))}
       </div>
-      <div className={classes["board-letters"]}>
-        <span>a</span>
-        <span>b</span>
-        <span>c</span>
-        <span>d</span>
-        <span>e</span>
-        <span>f</span>
-        <span>g</span>
-        <span>h</span>
-      </div>
+      <ul className={classes["board-letters"]}>
+        <li>a</li>
+        <li>b</li>
+        <li>c</li>
+        <li>d</li>
+        <li>e</li>
+        <li>f</li>
+        <li>g</li>
+        <li>h</li>
+      </ul>
     </div>
   );
 }

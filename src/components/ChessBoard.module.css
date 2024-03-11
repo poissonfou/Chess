@@ -1,18 +1,17 @@
 .board {
   margin-top: 0.3rem;
-  width: auto;
 }
 
 .board-nums {
-  display: flex;
-  flex-direction: column;
   position: absolute;
-  margin-left: 1.2rem;
+  margin-left: 0.1em;
+  margin-top: 0;
+  padding: 0;
 }
 
-.board-nums span {
+.board-nums li {
+  list-style: none;
   font-size: 1.5rem;
-  margin-bottom: 0rem;
   margin-top: 2rem;
 }
 
@@ -20,11 +19,34 @@
   display: flex;
   flex-direction: row;
   position: absolute;
+  padding: 0;
+  margin-top: -2em;
 }
 
-.board-letters span {
+.board-letters li {
+  list-style: none;
   font-size: 1.5rem;
-  margin-left: 4rem;
-  margin-right: -0.8rem;
-  margin-top: -1.8rem;
+  margin-left: 1.5em;
+  width: 50%;
+  margin-right: 0.7em;
+}
+
+@media (max-width: 675px) {
+  .board-letters {
+    margin-top: -1.1em;
+  }
+
+  .board-letters li {
+    font-size: 1rem;
+    margin-left: 1.8em;
+  }
+
+  .board-nums {
+    margin-left: 0.1em;
+  }
+
+  .board-nums li {
+    font-size: 1rem;
+    margin-top: 1.7rem;
+  }
 }

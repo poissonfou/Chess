@@ -400,10 +400,9 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
 
     for (let j = kingRow; j > finalKingRow; j--) {
       for (let i = kingIdx; i < finalKingIdx; i++) {
-        console.log(board[j][i]);
         if (j == kingsPosition.row && i == kingsPosition.idx) continue;
         if (board[j][i] == undefined) continue;
-        if (board[j][i].includes(identifier) || board[j][i] == 0) {
+        if (board[j][i] == 0 || board[j][i].includes(identifier)) {
           newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
           newBoard[kingsPosition.row][kingsPosition.idx] = 0;
 
@@ -411,7 +410,6 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
           newKingsPosition.idx = i;
 
           piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
-          console.log("here", newKingsPosition);
 
           newBoard = JSON.parse(JSON.stringify(board));
 
@@ -437,7 +435,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
     for (let i = kingIdx; i < finalKingIdx; i++) {
       if (j == kingsPosition.row && i == kingsPosition.idx) continue;
       if (board[j][i] == undefined) continue;
-      if (board[j][i].includes(identifier) || board[j][i] == 0) {
+      if (board[j][i] == 0 || board[j][i].includes(identifier)) {
         newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
         newBoard[kingsPosition.row][kingsPosition.idx] = 0;
 

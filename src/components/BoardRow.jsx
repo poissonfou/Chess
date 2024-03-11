@@ -72,24 +72,23 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
         showTooltip =
           +promotingState.idx === index && +promotingState.row === row;
         return (
-          <div key={`${row}.${+index}`}>
-            <div
-              id={`${row}.${+index}`}
-              className={`${isDark ? classes.dark : classes.light} ${
-                rowData[index] !== 0 ? classes[rowData[index]] : ""
-              }`}
-              onClick={(event) => {
-                piece = rowData[index] !== 0 ? classes[rowData[index]] : "";
-                if (piece !== "") {
-                  color = rowData[index].includes("w") ? "white" : "black";
-                } else {
-                  color = "";
-                }
-                return onClick(piece, color, event);
-              }}
-            >
-              {showTooltip == true && tooltip}
-            </div>
+          <div
+            key={`${row}.${+index}`}
+            id={`${row}.${+index}`}
+            className={`${isDark ? classes.dark : classes.light} ${
+              rowData[index] !== 0 ? classes[rowData[index]] : ""
+            }`}
+            onClick={(event) => {
+              piece = rowData[index] !== 0 ? classes[rowData[index]] : "";
+              if (piece !== "") {
+                color = rowData[index].includes("w") ? "white" : "black";
+              } else {
+                color = "";
+              }
+              return onClick(piece, color, event);
+            }}
+          >
+            {showTooltip == true && tooltip}
           </div>
         );
       })}

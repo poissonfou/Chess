@@ -1,5 +1,15 @@
 .main-div {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: auto 30%;
   justify-content: space-around;
+  align-items: center;
+  gap: 1em;
+  margin: 0 2em;
+}
+
+@media (max-width: 720px) {
+  .main-div {
+    display: flex;
+    flex-direction: column;
+  }
 }

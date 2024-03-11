@@ -1,49 +1,48 @@
 .row {
-  width: auto;
-  height: auto;
   display: flex;
   flex-direction: row;
-  margin-left: 1rem;
   overflow: visible;
 }
 
 .row div {
-  width: 4rem;
-  height: 4rem;
+  width: 4em;
+  height: 4em;
   background-size: contain;
   overflow: visible;
 }
 
-.row button {
-  border: none;
-  padding: 0;
+@media (max-width: 675px) {
+  .row div {
+    width: 3.8em;
+    height: 3.8em;
+  }
+}
+
+@media (max-width: 600px) {
+  .row div {
+    width: 3.5em;
+    height: 3.5em;
+  }
 }
 
 .tooltip {
-  position: absolute;
   display: grid;
   grid-auto-flow: column;
+  align-items: center;
   padding-right: 6.5rem;
-  padding-top: 0rem;
-  padding-bottom: -2rem;
-  z-index: 100;
-  margin-left: 0rem;
-  margin-top: 0rem;
+  z-index: 10;
   border-radius: 5px;
   background-color: rgb(255, 255, 255);
-  box-shadow: 3px 0px rgb(209, 209, 209);
-}
-
-.tooltip-wrap {
-  display: none;
+  box-shadow: 3px 0px rgb(192, 191, 191);
 }
 
 .tooltip button {
-  height: 2rem;
-  width: 2rem;
-  margin-top: 0.7rem;
-  margin-left: 0.5rem;
+  height: 2.4em;
+  width: 2.4em;
+  margin-left: 0.6em;
   border-radius: 3px;
+  border: 0.1em solid rgb(209, 209, 209);
+  box-shadow: 1px 2px 5px rgb(56, 56, 56);
   background-size: contain;
 }
 

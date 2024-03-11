@@ -1,179 +1,179 @@
-.board {
+.moves-log {
   background-color: rgba(116, 115, 115, 0.2);
-  width: 22rem;
+  padding-left: 1em;
+  padding-right: 1em;
+  width: 100%;
   height: 25rem;
-  margin-top: 5.5rem;
-  margin-left: -15rem;
   border-radius: 5px;
 }
 
-.moves {
-  display: flex;
-  flex-direction: row;
-  width: 22rem;
-  height: 21rem;
+@media (max-width: 690px) {
+  .moves-log {
+    width: 25em;
+  }
 }
 
-.board h1 {
+@media (max-width: 601px) {
+  .moves-log {
+    width: 22em;
+  }
+}
+
+.moves-log h1 {
   color: white;
-  margin-left: 8rem;
-  padding-top: 1rem;
-  margin-bottom: 0rem;
+  text-align: center;
+  padding-top: 0.2em;
+}
+
+.entrys {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 21em;
+  justify-content: space-around;
 }
 
 .start-game-div {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  width: 25rem;
-  height: 25rem;
-  margin-top: 5rem;
-  margin-left: -10rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
   border-radius: 5px;
   background-color: rgba(116, 115, 115, 0.2);
+}
+
+.selected-time {
+  border: none;
+  border-radius: 4.5px;
+  background-color: rgb(221, 221, 196);
+  width: 100%;
+  padding: 0.5em;
+  font-size: 1.7rem;
+}
+
+.play-button {
+  padding: 0.3em;
+  width: 100%;
+  border: 0.1em solid rgb(44, 44, 44);
+  border-radius: 10px;
+  box-shadow: 0px 4px rgb(56, 56, 56);
+  background-color: rgb(17, 124, 17);
+  font-size: 2rem;
+  color: white;
+}
+
+.piece {
+  width: 1.3em;
+  height: 1.2em;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.entry-white {
+  margin: 0 2em;
+  width: 100%;
+  padding: 0;
+  margin-right: 0em;
+  margin-left: 1em;
+}
+
+.entry-black {
+  width: 100%;
+  padding: 0;
+  margin: 0 5em;
+  margin-left: 0em;
+  margin-right: 1em;
+}
+
+.entry-white li,
+.entry-black li {
+  display: flex;
+  font-size: 1.5rem;
+  margin-bottom: 0.5em;
+  color: white;
 }
 
 .overflow {
   overflow-y: scroll;
 }
 
-.selected-time {
-  border: none;
-  border-radius: 4.5px;
-  margin-left: 5rem;
-  margin-top: 1rem;
-  background-color: rgb(221, 221, 196);
-  width: 15rem;
-  height: 3.5rem;
-  font-size: 1.7rem;
-  margin-bottom: 1rem;
+.entrys::-webkit-scrollbar {
+  width: 10px;
+  display: block;
 }
 
-.selected-time-overflow {
-  margin-top: 5rem;
+.entrys::-webkit-scrollbar-track {
+  background-color: rgba(116, 115, 115, 0.2);
 }
 
-.dropdown {
-  margin-left: 5.7rem;
-  margin-bottom: 2rem;
+.entrys::-webkit-scrollbar-thumb {
+  background: #535353;
+  border-radius: 5px;
 }
 
-.dropdown p {
+.time-options {
+  margin-left: 0.5em;
+  margin-bottom: 1em;
+}
+
+.time-options p {
   font-weight: 700;
   color: white;
 }
 
-.dropdown-options {
+.time-options-item {
   display: flex;
   flex-direction: row;
 }
 
-.dropdown-options button {
+.time-options-item button {
   border: none;
   border-radius: 2px;
   margin-right: 0.5rem;
   background-color: rgb(221, 221, 196);
-  width: 4rem;
-  height: 2rem;
-  font-size: 1rem;
+  width: 4em;
+  padding: 0.5em 0em;
+  font-size: clamp(0.2rem, 4vw, 1rem);
 }
 
-.inputs {
+.custom-time-inputs {
   display: flex;
   flex-direction: row;
 }
 
-.inputs input {
+.custom-time-inputs input {
   width: 20%;
   margin-right: 0.5rem;
-  height: 2rem;
+  height: 2em;
   border-radius: 2px;
   border: none;
   font-size: 1rem;
   padding-left: 0.2rem;
 }
 
-.inputs button {
+.custom-time-inputs button {
   background-color: white;
   border: none;
   border-radius: 2px;
 }
 
-.inputs button img {
-  width: 1.5rem;
-  height: 1.5rem;
+.custom-time-inputs button img {
+  width: 2em;
+  height: 2em;
 }
 
-.inputs input::placeholder {
-  padding-left: 0.2rem;
+.custom-time-inputs input::placeholder {
+  padding-left: 0.2em;
   font-size: 0.8rem;
 }
 
-.inputs input:focus {
-  outline: none;
-}
-
-.play-button {
-  width: 15rem;
-  height: 3.5rem;
-  margin-left: 5rem;
-  border-width: 0.2;
-  border-style: solid;
-  border-radius: 10px;
-  box-shadow: 0px 4px rgb(56, 56, 56);
-  border-color: rgb(44, 44, 44);
-  background-color: rgb(17, 124, 17);
-  font-size: 2rem;
-  color: white;
-}
-
-.start-game-div button:hover {
-  cursor: pointer;
-}
-
-.board::-webkit-scrollbar,
-.start-game-div::-webkit-scrollbar {
-  width: 10px;
-  display: block;
-}
-
-.board::-webkit-scrollbar-track,
-.start-game-div::-webkit-scrollbar-track {
-  background-color: rgba(116, 115, 115, 0.2);
-}
-
-.board::-webkit-scrollbar-thumb,
-.start-game-div::-webkit-thumb {
-  background: #535353;
-  border-radius: 5px;
-}
-
-.board p:last-child {
+.moves-log p:last-child {
   color: white;
   margin-top: 1.7rem;
   margin-bottom: 1rem;
   font-size: 1.2rem;
-}
-
-.piece {
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: 1.5rem;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-.log-entry {
-  display: flex;
-  flex-direction: row;
-  margin-left: 2rem;
-}
-
-.number {
-  font-size: 1.5rem;
-  color: white;
 }
 
 .bp {
@@ -222,4 +222,8 @@
 
 .wk {
   background-image: url("../assets/whiteKing.png");
+}
+
+button:hover {
+  cursor: pointer;
 }

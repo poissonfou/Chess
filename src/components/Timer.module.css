@@ -1,8 +1,7 @@
 .timer {
   background-color: white;
-  width: 7rem;
-  height: 2rem;
-  margin-left: 1rem;
+  width: 7em;
+  height: 2em;
   border-radius: 5px;
 }
 
@@ -10,5 +9,5 @@
   font-size: 1.7rem;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   margin-top: 0.3rem;
-  margin-left: 2rem;
+  text-align: center;
 }
