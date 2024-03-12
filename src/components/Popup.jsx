@@ -17,6 +17,8 @@ export default function Popup({ board, setBoard }) {
 
   let miliseconds = minutesMiliseconds + secondsInput;
 
+  let capitalLetter;
+  let lowerCase;
   let seconds = miliseconds / 1000;
   let minutes = seconds / 60;
   let date = new Date();
@@ -26,13 +28,24 @@ export default function Popup({ board, setBoard }) {
   seconds = date.getSeconds();
   minutes = date.getMinutes();
 
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+
   function restartGame() {
     dispatch(movesActions.empty());
     setBoard([...board]);
-    dispatch(timerActions.setTime({ minutes, seconds, increment }));
+    dispatch(
+      timerActions.setTime({
+        minutes: minutesMiliseconds,
+        seconds: secondsInput,
+        increment: increment,
+      })
+    );
     dispatch(timerActions.setRunningTimer("white"));
     dispatch(timerActions.changeKeys());
     dispatch(hasEndedActions.setHasEnded());
+    dispatch(hasEndedActions.setShowPopup());
     dispatch(turnActions.changeTurn("white"));
   }
 
@@ -40,8 +53,10 @@ export default function Popup({ board, setBoard }) {
     dispatch(hasEndedActions.setShowPopup());
   }
 
-  let capitalLetter = turn[0].toUpperCase();
-  let lowerCase = turn.slice(1);
+  if (turn !== null) {
+    capitalLetter = turn[0].toUpperCase();
+    lowerCase = turn.slice(1);
+  }
 
   return (
     <div className={classes.popup}>

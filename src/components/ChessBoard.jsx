@@ -324,6 +324,8 @@ function ChessBoard({ board, setBoard }) {
         move.push("0-1");
       }
 
+      piecesAttacking = [];
+      checkMate = false;
       dispatch(hasEndedActions.setHasEnded());
       dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));

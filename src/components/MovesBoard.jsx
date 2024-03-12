@@ -2,7 +2,12 @@ import classes from "./MovesBoard.module.css";
 import arrow from "../assets/arrow-right-short.svg";
 
 import { useSelector, useDispatch } from "react-redux";
-import { turnActions, timerActions, hasEndedActions } from "../store";
+import {
+  turnActions,
+  timerActions,
+  hasEndedActions,
+  movesActions,
+} from "../store";
 import { useState, useRef } from "react";
 
 function MovesBoard({ board, setBoard }) {
@@ -15,6 +20,7 @@ function MovesBoard({ board, setBoard }) {
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
   let hasEnded = useSelector((state) => state.hasEnded.hasEnded);
+  let showPopup = useSelector((state) => state.hasEnded.showPopup);
   let dispatch = useDispatch();
   let movesBlack = [];
   let movesWhite = [];
@@ -84,28 +90,36 @@ function MovesBoard({ board, setBoard }) {
   }
 
   function showTimeOptions() {
-    dispatch(hasEndedActions.setHasEnded());
+    console.log("we are here");
+    dispatch(movesActions.empty());
     setBoard([...board]);
     dispatch(
       timerActions.setTime({
-        minutes: 0 * 1000,
-        seconds: 0 * 1000,
-        increment: 0 * 1000,
+        minutes: 600000,
+        seconds: 0,
+        increment: 0,
       })
     );
+    dispatch(timerActions.setRunningTimer(null));
     dispatch(timerActions.changeKeys());
+    dispatch(hasEndedActions.setHasEnded());
+    if (showPopup) {
+      dispatch(hasEndedActions.setShowPopup());
+    }
     dispatch(turnActions.changeTurn(null));
   }
 
-  movesWhite = moves.filter((move) => {
-    let key = move[0];
-    return key[0].includes("w");
-  });
+  if (moves.length !== 0) {
+    movesWhite = moves.filter((move) => {
+      let key = move[0];
+      return key[0].includes("w");
+    });
 
-  movesBlack = moves.filter((move) => {
-    let key = move[0];
-    return key[0].includes("b") && !key[0].includes("w");
-  });
+    movesBlack = moves.filter((move) => {
+      let key = move[0];
+      return key[0].includes("b") && !key[0].includes("w");
+    });
+  }
 
   return (
     <div>

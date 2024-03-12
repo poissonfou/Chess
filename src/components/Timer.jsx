@@ -1,7 +1,7 @@
 import classes from "./Timer.module.css";
 import { turnActions, timerActions, movesActions } from "../store";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 let newTime;
@@ -16,6 +16,7 @@ function Timer({ color }) {
   let minutesMiliseconds = useSelector((state) => state.timer.time.minutes);
   let secondsInput = useSelector((state) => state.timer.time.seconds);
   let increment = useSelector((state) => state.timer.time.increment);
+  let turn = useSelector((state) => state.turn.turn);
   let isActive = useSelector((state) => state.timer[color]);
 
   const [timer, setTimer] = useState(minutesMiliseconds + secondsInput);
@@ -57,22 +58,24 @@ function Timer({ color }) {
   //   }
   // }
 
-  if (timer == 0) {
-    console.log("game ended");
-    //solve this problem later
-    let move = [];
-    move.push("");
+  useEffect(() => {
+    if (timer == 0 && turn !== null) {
+      console.log("game ended");
+      //solve this problem later
+      let move = [];
+      move.push("");
 
-    if (color == "white") {
-      move.push("0-1");
-    } else {
-      move.push("1-0");
+      if (color == "white") {
+        move.push("0-1");
+      } else {
+        move.push("1-0");
+      }
+
+      dispatch(movesActions.push(move));
+      dispatch(turnActions.changeTurn(null));
+      dispatch(timerActions.setRunningTimer(null));
     }
-
-    dispatch(movesActions.push(move));
-    dispatch(turnActions.changeTurn(null));
-    dispatch(timerActions.setRunningTimer(null));
-  }
+  }, [timer]);
 
   if (seconds == 0) {
     seconds = seconds + "0";
