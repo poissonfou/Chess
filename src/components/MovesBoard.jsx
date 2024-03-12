@@ -2,10 +2,10 @@ import classes from "./MovesBoard.module.css";
 import arrow from "../assets/arrow-right-short.svg";
 
 import { useSelector, useDispatch } from "react-redux";
-import { turnActions, timerActions } from "../store";
+import { turnActions, timerActions, hasEndedActions } from "../store";
 import { useState, useRef } from "react";
 
-function MovesBoard() {
+function MovesBoard({ board, setBoard }) {
   const [selectedTime, setSelectedTime] = useState("10:00");
   const [validInput, setvalidInput] = useState(true);
   let minutesRef = useRef(0);
@@ -14,6 +14,7 @@ function MovesBoard() {
 
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
+  let hasEnded = useSelector((state) => state.hasEnded.hasEnded);
   let dispatch = useDispatch();
   let movesBlack = [];
   let movesWhite = [];
@@ -80,6 +81,20 @@ function MovesBoard() {
     dispatch(timerActions.setTime({ minutes, seconds, increment }));
     dispatch(timerActions.changeKeys());
     setSelectedTime(timeSelected);
+  }
+
+  function showTimeOptions() {
+    dispatch(hasEndedActions.setHasEnded());
+    setBoard([...board]);
+    dispatch(
+      timerActions.setTime({
+        minutes: 0 * 1000,
+        seconds: 0 * 1000,
+        increment: 0 * 1000,
+      })
+    );
+    dispatch(timerActions.changeKeys());
+    dispatch(turnActions.changeTurn(null));
   }
 
   movesWhite = moves.filter((move) => {
@@ -182,7 +197,13 @@ function MovesBoard() {
       )}
       {turn !== null && (
         <div>
-          <div className={classes["moves-log"]}>
+          <div
+            className={
+              hasEnded
+                ? `${classes["moves-log"]} ${classes["expanded-moves-log"]}`
+                : `${classes["moves-log"]}`
+            }
+          >
             <h1>Moves</h1>
             <div
               className={
@@ -229,6 +250,14 @@ function MovesBoard() {
                 </div>
               )}
             </div>
+            {hasEnded && (
+              <button
+                className={classes["play-button"]}
+                onClick={showTimeOptions}
+              >
+                New Game
+              </button>
+            )}
           </div>
         </div>
       )}

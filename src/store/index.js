@@ -2,6 +2,7 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 
 const moves = { moves: [] };
 let turn = { turn: null };
+let hasEnded = { hasEnded: false, showPopup: false };
 let timer = {
   white: false,
   forceRenderWhite: 5,
@@ -24,6 +25,9 @@ const movesSlice = createSlice({
     },
     pop(state) {
       state.moves.pop();
+    },
+    empty(state) {
+      state.moves = [];
     },
   },
 });
@@ -78,12 +82,26 @@ const promotingPieceSlice = createSlice({
   },
 });
 
+const hasEndedSlice = createSlice({
+  name: "hasEnded",
+  initialState: hasEnded,
+  reducers: {
+    setHasEnded(state) {
+      state.hasEnded = !state.hasEnded;
+    },
+    setShowPopup(state) {
+      state.showPopup = !state.showPopup;
+    },
+  },
+});
+
 export const store = configureStore({
   reducer: {
     moves: movesSlice.reducer,
     turn: turnSlice.reducer,
     timer: timerSlice.reducer,
     promotingPiece: promotingPieceSlice.reducer,
+    hasEnded: hasEndedSlice.reducer,
   },
 });
 
@@ -91,3 +109,4 @@ export const movesActions = movesSlice.actions;
 export const turnActions = turnSlice.actions;
 export const timerActions = timerSlice.actions;
 export const promotingPieceActions = promotingPieceSlice.actions;
+export const hasEndedActions = hasEndedSlice.actions;

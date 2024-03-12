@@ -390,7 +390,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   let finalKingRow;
 
   let kingIdx = kingsPosition.idx - 1;
-  let finalKingIdx = kingIdx + 3;
+  let finalKingIdx = kingIdx + 2;
 
   //checking if king can move
 
@@ -427,12 +427,14 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
     kingRow = kingsPosition.row - 1;
     finalKingRow = kingRow + 2;
   } else {
-    kingRow = kingsPosition.row + 1;
+    kingRow = kingsPosition.row - 1;
     finalKingRow = kingRow + 2;
   }
 
-  for (let j = kingRow; j < finalKingRow; j++) {
-    for (let i = kingIdx; i < finalKingIdx; i++) {
+  console.log(kingRow, finalKingRow, kingIdx, finalKingIdx);
+
+  for (let j = kingRow; j <= finalKingRow; j++) {
+    for (let i = kingIdx; i <= finalKingIdx; i++) {
       if (j == kingsPosition.row && i == kingsPosition.idx) continue;
       if (board[j][i] == undefined) continue;
       if (board[j][i] == 0 || board[j][i].includes(identifier)) {
@@ -467,8 +469,8 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
     identifier = identifier == "w" ? "b" : "w";
 
     if (
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "h" ||
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "p"
+      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "p" ||
+      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q"
     )
       return true;
 
@@ -480,8 +482,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
     ) {
       idx = piecesChecking[0].idx + 1;
       row = piecesChecking[0].row + 1;
-
-      for (let i = idx; i < kingsPosition.idx; i++) {
+      for (let i = idx; i <= kingsPosition.idx; i++) {
         canBeTaken = isChecking(board, { row: row, idx: i }, identifier);
         if (canBeTaken.length) return false;
         row++;
@@ -500,6 +501,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
           { row: i, idx: piecesChecking[0].idx },
           identifier
         );
+
         if (canBeTaken.length) return false;
       }
     }

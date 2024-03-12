@@ -1,5 +1,5 @@
 import classes from "./Timer.module.css";
-import { turnActions, timerActions } from "../store";
+import { turnActions, timerActions, movesActions } from "../store";
 
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -60,6 +60,16 @@ function Timer({ color }) {
   if (timer == 0) {
     console.log("game ended");
     //solve this problem later
+    let move = [];
+    move.push("");
+
+    if (color == "white") {
+      move.push("0-1");
+    } else {
+      move.push("1-0");
+    }
+
+    dispatch(movesActions.push(move));
     dispatch(turnActions.changeTurn(null));
     dispatch(timerActions.setRunningTimer(null));
   }

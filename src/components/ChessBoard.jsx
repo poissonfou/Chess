@@ -15,22 +15,12 @@ import {
   turnActions,
   timerActions,
   promotingPieceActions,
+  hasEndedActions,
 } from "../store";
 
 import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
-
-const arrBoard = [
-  ["bh", "bn", "bb", "bq", "bk", "bb", "bn", "bh"],
-  ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-  ["wh", "wn", "wb", "wq", "wk", "wb", "wn", "wh"],
-];
 
 let piecesTaken = { white: [], black: [] };
 let kingsPosition = {
@@ -51,8 +41,7 @@ let boardLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 let promoting = false;
 
-function ChessBoard() {
-  const [board, setBoard] = useState(arrBoard);
+function ChessBoard({ board, setBoard }) {
   const [selectedPiece, setSelectedPiece] = useState([]);
   const dispatch = useDispatch();
   let turn = useSelector((state) => state.turn.turn);
@@ -234,22 +223,6 @@ function ChessBoard() {
       promoting = true;
     }
 
-    if (promoting == false) {
-      let move = [];
-      move.push(selectedPiece[0].piece);
-
-      if (board[rowTo][idxTo] == 0) {
-        move.push(boardLetters[idxTo]);
-        move.push(boardNumber[rowTo]);
-      } else {
-        move.push(boardLetters[idxFrom]);
-        let pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
-        move.push(pieceTaken);
-      }
-
-      dispatchMove("push", move);
-    }
-
     kingColor = turn == "white" ? "black" : "white";
 
     let newBoard = JSON.parse(JSON.stringify(board));
@@ -306,6 +279,31 @@ function ChessBoard() {
       );
     }
 
+    if (promoting == false) {
+      let move = [];
+      move.push(selectedPiece[0].piece);
+
+      if (board[rowTo][idxTo] == 0) {
+        if (piecesAttacking.length && !checkMate) {
+          move.push(boardLetters[idxTo]);
+          move.push(boardNumber[rowTo] + "+");
+        }
+        if (piecesAttacking.length && checkMate) {
+          move.push(boardLetters[idxTo]);
+          move.push(boardNumber[rowTo] + "++");
+        } else {
+          move.push(boardLetters[idxTo]);
+          move.push(boardNumber[rowTo]);
+        }
+      } else {
+        move.push(boardLetters[idxFrom]);
+        let pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
+        move.push(pieceTaken);
+      }
+
+      dispatchMove("push", move);
+    }
+
     setBoard([...newBoard]);
 
     if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
@@ -316,7 +314,18 @@ function ChessBoard() {
 
     if (checkMate) {
       console.log("game ended");
-      dispatch(turnActions.changeTurn(null));
+
+      let move = [];
+      move.push("");
+
+      if (turn == "white") {
+        move.push("1-0");
+      } else {
+        move.push("0-1");
+      }
+
+      dispatch(hasEndedActions.setHasEnded());
+      dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
       return;
     }
@@ -356,7 +365,7 @@ function ChessBoard() {
         <li>1</li>
       </ul>
       <div>
-        {arrBoard.map((_, idx) => (
+        {board.map((_, idx) => (
           <BoardRow
             key={idx}
             dark={idx % 2 !== 0}
