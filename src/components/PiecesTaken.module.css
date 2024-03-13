@@ -4,6 +4,10 @@
   margin-right: -1.5em;
 }
 
+.pieces-taken-extra {
+  margin-right: -0.2em;
+}
+
 .pieces-taken div {
   display: flex;
 }
@@ -15,6 +19,13 @@
   padding-left: 1.2em;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.pieces-taken p {
+  color: white;
+  padding-top: 0.2em;
+  margin: 0;
+  margin-left: -1.3em;
 }
 
 .bp {
