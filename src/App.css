@@ -7,6 +7,11 @@
   margin: 0 2em;
 }
 
+.player-info {
+  display: flex;
+  justify-content: space-between;
+}
+
 @media (max-width: 720px) {
   .main-div {
     display: flex;

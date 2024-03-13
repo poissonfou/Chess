@@ -214,7 +214,8 @@
   margin-top: -8.5em;
 }
 
-.abandon-popup div:hover {
+.abandon-popup div:hover,
+.abandon-button:hover {
   cursor: pointer;
 }
 

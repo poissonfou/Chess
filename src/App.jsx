@@ -6,6 +6,7 @@ import ChessBoard from "./components/ChessBoard";
 import MovesBoard from "./components/MovesBoard";
 import Timer from "./components/Timer";
 import Popup from "./components/Popup";
+import PiecesTaken from "./components/PiecesTaken";
 
 let whiteKey;
 let blackKey;
@@ -22,6 +23,8 @@ const arrBoard = [
   ["wh", "wn", "wb", "wq", "wk", "wb", "wn", "wh"],
 ];
 
+let piecesTaken = { white: [], black: [] };
+
 function App() {
   const [board, setBoard] = useState(arrBoard);
   whiteKey = useSelector((state) => state.timer.forceRenderWhite);
@@ -31,10 +34,20 @@ function App() {
   return (
     <div className="main-div">
       <div>
-        <Timer key={blackKey} color={"black"} />
+        <div className="player-info">
+          <Timer key={blackKey} color={"black"} />
+          <PiecesTaken piecesTaken={piecesTaken} color="white" />
+        </div>
         {showPopup && <Popup board={arrBoard} setBoard={setBoard} />}
-        <ChessBoard board={board} setBoard={setBoard} />
-        <Timer key={whiteKey} color={"white"} />
+        <ChessBoard
+          board={board}
+          setBoard={setBoard}
+          piecesTaken={piecesTaken}
+        />
+        <div className="player-info">
+          <Timer key={whiteKey} color={"white"} />
+          <PiecesTaken piecesTaken={piecesTaken} color="black" />
+        </div>
       </div>
       <MovesBoard board={arrBoard} setBoard={setBoard} />
     </div>

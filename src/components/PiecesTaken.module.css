@@ -1,0 +1,66 @@
+.pieces-taken {
+  display: flex;
+  margin-top: 0.3em;
+  margin-right: -1.5em;
+}
+
+.pieces-taken div {
+  display: flex;
+}
+
+.pieces-taken div span {
+  width: 1.5em;
+  height: 1.5em;
+  margin-left: -2em;
+  padding-left: 1.2em;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.bp {
+  background-image: url("../assets/blackPawn.png");
+}
+
+.bh {
+  background-image: url("../assets/blackHook.png");
+}
+
+.bn {
+  background-image: url("../assets/blackKnight.png");
+}
+
+.bb {
+  background-image: url("../assets/blackBishop.png");
+}
+
+.bq {
+  background-image: url("../assets/blackQueen.png");
+}
+
+.bk {
+  background-image: url("../assets/blackKingpng.png");
+}
+
+.wp {
+  background-image: url("../assets/whitePawn.png");
+}
+
+.wh {
+  background-image: url("../assets/whiteHook.png");
+}
+
+.wn {
+  background-image: url("../assets/whiteKnight.png");
+}
+
+.wb {
+  background-image: url("../assets/whiteBishop.png");
+}
+
+.wq {
+  background-image: url("../assets/whiteQueen.png");
+}
+
+.wk {
+  background-image: url("../assets/whiteKing.png");
+}

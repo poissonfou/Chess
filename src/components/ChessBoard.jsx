@@ -22,7 +22,6 @@ import { getCoords, isChecking, isCheckMate } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
 
-let piecesTaken = { white: [], black: [] };
 let kingsPosition = {
   white: { row: 7, idx: 4, hasMoved: false },
   black: { row: 0, idx: 4, hasMoved: false },
@@ -41,7 +40,7 @@ let boardLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 let promoting = false;
 
-function ChessBoard({ board, setBoard }) {
+function ChessBoard({ board, setBoard, piecesTaken }) {
   const [selectedPiece, setSelectedPiece] = useState([]);
   const dispatch = useDispatch();
   let turn = useSelector((state) => state.turn.turn);
