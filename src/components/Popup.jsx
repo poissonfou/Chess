@@ -61,7 +61,10 @@ export default function Popup({ board, setBoard }) {
   return (
     <div className={classes.popup}>
       <i className="bi bi-x-lg" onClick={closePopup}></i>
-      <h1>{capitalLetter + lowerCase + " has won!"}</h1>
+      {turn == "draw" && <h1 className={classes["draw-message"]}>Draw!</h1>}
+      {(turn == "white" || turn == "black") && (
+        <h1>{capitalLetter + lowerCase + " has won!"}</h1>
+      )}
       <button onClick={restartGame}>{"New " + minutes + ":" + seconds} </button>
     </div>
   );

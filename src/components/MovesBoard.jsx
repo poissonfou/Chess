@@ -13,6 +13,9 @@ import { useState, useRef } from "react";
 function MovesBoard({ board, setBoard }) {
   const [selectedTime, setSelectedTime] = useState("10:00");
   const [validInput, setvalidInput] = useState(true);
+  const [AbandonPopup, setAbandonPopup] = useState(false);
+  const [DrawPopup, setDrawPopup] = useState(false);
+
   let minutesRef = useRef(0);
   let secondsRef = useRef(0);
   let incrementRef = useRef(0);
@@ -53,12 +56,25 @@ function MovesBoard({ board, setBoard }) {
     dispatch(turnActions.changeTurn("white"));
   }
 
+  function showAbandonPopup() {
+    let prevValue = AbandonPopup;
+    prevValue = !prevValue;
+    setAbandonPopup(prevValue);
+  }
+
+  function showDrawnPopup() {
+    let preValue = DrawPopup;
+    preValue = !preValue;
+    setDrawPopup(preValue);
+  }
+
   function setTimer(event) {
     let time;
     let minutes;
     let seconds;
     let increment;
     let timeSelected;
+
     if (event !== undefined) {
       time = event.target.id.split(".");
       minutes = +time[0];
@@ -107,6 +123,22 @@ function MovesBoard({ board, setBoard }) {
       dispatch(hasEndedActions.setShowPopup());
     }
     dispatch(turnActions.changeTurn(null));
+  }
+
+  function drawGame() {
+    showDrawnPopup();
+    dispatch(turnActions.changeTurn("draw"));
+    dispatch(hasEndedActions.setHasEnded());
+    dispatch(hasEndedActions.setShowPopup());
+    dispatch(timerActions.setRunningTimer(null));
+  }
+
+  function abandonGame(color) {
+    showAbandonPopup();
+    dispatch(turnActions.changeTurn(color));
+    dispatch(hasEndedActions.setHasEnded());
+    dispatch(hasEndedActions.setShowPopup());
+    dispatch(timerActions.setRunningTimer(null));
   }
 
   if (moves.length !== 0) {
@@ -211,13 +243,7 @@ function MovesBoard({ board, setBoard }) {
       )}
       {turn !== null && (
         <div>
-          <div
-            className={
-              hasEnded
-                ? `${classes["moves-log"]} ${classes["expanded-moves-log"]}`
-                : `${classes["moves-log"]}`
-            }
-          >
+          <div className={classes["moves-log"]}>
             <h1>Moves</h1>
             <div
               className={
@@ -264,7 +290,44 @@ function MovesBoard({ board, setBoard }) {
                 </div>
               )}
             </div>
-            {hasEnded && (
+            {!hasEnded ? (
+              <div className={classes["actions"]}>
+                <div
+                  className={classes["abandon-button"]}
+                  onClick={showAbandonPopup}
+                >
+                  {AbandonPopup && (
+                    <div className={classes["abandon-popup"]}>
+                      <div onClick={() => abandonGame("black")}>
+                        <div className={classes.white}></div>
+                        <p className={classes.test}>White</p>
+                      </div>
+                      <div onClick={() => abandonGame("white")}>
+                        <div className={classes.black}></div>
+                        <p className={classes.test}> Black</p>
+                      </div>
+                    </div>
+                  )}
+                  <i className="bi bi-flag-fill"></i>
+                  <p>Abandon</p>
+                </div>
+                <div
+                  className={classes["draw-button"]}
+                  onClick={showDrawnPopup}
+                >
+                  {DrawPopup && (
+                    <div className={classes["draw-popup"]}>
+                      <p>Are you sure?</p>
+                      <div>
+                        <button onClick={drawGame}>Yes</button>
+                        <button onClick={showDrawnPopup}>No</button>
+                      </div>
+                    </div>
+                  )}
+                  <p>Draw</p>
+                </div>
+              </div>
+            ) : (
               <button
                 className={classes["play-button"]}
                 onClick={showTimeOptions}
