@@ -1,5 +1,5 @@
 import classes from "./Timer.module.css";
-import { turnActions, timerActions, movesActions } from "../store";
+import { turnActions, timerActions, hasEndedActions } from "../store";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -51,31 +51,14 @@ function Timer({ color }) {
     clearInterval(deadline);
   }
 
-  // if (isActive == false && deadline !== undefined) {
-  //   console.log("we are here");
-  //   clearInterval(deadline);
-  //   if (increment) {
-  //     console.log("we are here");
-  //     newTime = timer + increment;
-  //     setTimer(newTime);
-  //   }
-  // }
-
   useEffect(() => {
     if (timer == 0 && turn !== null) {
       console.log("game ended");
       //solve this problem later
-      let move = [];
-      move.push("");
 
-      if (color == "white") {
-        move.push("0-1");
-      } else {
-        move.push("1-0");
-      }
-
-      dispatch(movesActions.push(move));
-      dispatch(turnActions.changeTurn(null));
+      dispatch(turnActions.changeTurn(color == "white" ? "black" : "white"));
+      dispatch(hasEndedActions.setHasEnded());
+      dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
     }
   }, [timer]);

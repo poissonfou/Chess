@@ -36,15 +36,6 @@ function App() {
   hasEnded = useSelector((state) => state.hasEnded.hasEnded);
   moves = useSelector((state) => state.moves.moves);
 
-  const [moveBackward, setMoveBackward] = useState({
-    move: moves[moves.length - 1],
-    idx: moves.length - 1,
-  });
-  const [moveFoward, setMoveFoward] = useState({
-    move: moves[moves.length + 1],
-    idx: moves.length + 1,
-  });
-
   return (
     <div className="main-div">
       <div>
@@ -75,10 +66,6 @@ function App() {
         board={board}
         setBoard={setBoard}
         piecesTaken={piecesTaken}
-        moveBackward={moveBackward}
-        moveFoward={moveFoward}
-        setMoveBackward={setMoveBackward}
-        setMoveFoward={setMoveFoward}
         fullLogMoves={fullLogMoves}
       />
     </div>

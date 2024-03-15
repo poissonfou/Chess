@@ -9,7 +9,10 @@ import {
   hasEndedActions,
   movesActions,
 } from "../store";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+
+let moveBackward, moveFoward;
+let currentBoard;
 
 function MovesBoard({
   initialBoard,
@@ -17,10 +20,6 @@ function MovesBoard({
   setBoard,
   piecesTaken,
   fullLogMoves,
-  moveBackward,
-  moveFoward,
-  setMoveFoward,
-  setMoveBackward,
 }) {
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
@@ -41,21 +40,80 @@ function MovesBoard({
   let movesWhite = [];
   let extraMargin = "";
   let lastMove = [];
-  let propMoveBackward = moveBackward;
-  let propMoveFoward = moveFoward;
 
-  function retractMoves(direction, currentSelectedMove) {
+  useEffect(() => {
+    moveBackward = {
+      move: moves[moves.length - 1],
+      idx: moves.length - 1,
+    };
+
+    if (moves.length == 1) {
+      moveFoward = {
+        move: moves[moves.length - 1],
+        idx: moves.length - 1,
+      };
+    } else {
+      moveFoward = {
+        move: moves[moveBackward.idx - 1],
+        idx: moveBackward.idx - 1,
+      };
+    }
+  }, [moves]);
+
+  function returnToLatest() {
+    if (moves.length == 0) return;
+
+    moveBackward = {
+      move: moves[moves.length - 1],
+      idx: moves.length - 1,
+    };
+
+    moveBackward = {
+      move: moves[moves.length - 1],
+      idx: moves.length - 1,
+    };
+
+    setBoard(currentBoard);
+  }
+
+  function resetBoard() {
+    if (moves.length == 0) return;
+
+    moveBackward = {
+      move: moves[0],
+      idx: 0,
+    };
+
+    moveFoward = {
+      move: moves[0],
+      idx: 0,
+    };
+
+    setBoard((prevState) => {
+      currentBoard = prevState;
+      return initialBoard;
+    });
+  }
+
+  function retractMoves(direction) {
     if (direction == "backwards") {
-      if (currentSelectedMove.idx == -1) return;
+      if (moves.length == 0) return;
 
-      console.log("we are here");
+      if (moveBackward !== undefined && moveBackward.idx == -1) return;
 
-      const move = fullLogMoves[currentSelectedMove.idx];
+      if (moveBackward == undefined) {
+        moveBackward = {
+          move: moves[moves.length - 1],
+          idx: moves.length - 1,
+        };
+      }
+
+      const move = fullLogMoves[moveBackward.idx];
       let newBoard = JSON.parse(JSON.stringify(board));
-      let key = currentSelectedMove.move[0][0];
+      let key = moveBackward.move[0][0];
 
       newBoard[move[key].rowFrom][move[key].idxFrom] = key;
-      console.log(newBoard);
+
       if (move[key].enPassant) {
         newBoard[move[key].rowTo][move[key].idxTo] = 0;
         newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
@@ -63,46 +121,60 @@ function MovesBoard({
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
       }
 
-      setMoveBackward({
-        move: moves[currentSelectedMove.idx - 1],
-        idx: currentSelectedMove.idx - 1,
+      setBoard((prevState) => {
+        if (moveBackward.idx == moves.length - 1) {
+          currentBoard = prevState;
+        }
+        return [...newBoard];
       });
 
-      setMoveFoward({
-        move: moves[currentSelectedMove.idx],
-        idx: currentSelectedMove.idx,
-      });
+      if (moveBackward.idx == 0) {
+        moveFoward = {
+          move: moves[moveBackward.idx],
+          idx: moveBackward.idx,
+        };
 
-      setBoard([...newBoard]);
+        moveBackward = {
+          move: moves[moveBackward.idx],
+          idx: moveBackward.idx,
+        };
+      } else {
+        moveFoward = {
+          ...moveBackward,
+        };
+
+        moveBackward = {
+          move: moves[moveBackward.idx - 1],
+          idx: moveBackward.idx - 1,
+        };
+      }
     } else {
-      if (currentSelectedMove.idx > moves.length - 1) return;
+      if (moveFoward == undefined) return;
 
-      console.log(currentSelectedMove, currentMove);
+      if (moveFoward.idx >= moves.length) return;
 
-      console.log("we are here");
-
-      const move = fullLogMoves[currentSelectedMove.idx];
+      const move = fullLogMoves[moveFoward.idx];
       let newBoard = JSON.parse(JSON.stringify(board));
-      let key = currentSelectedMove.move[0][0];
+      let key = moveFoward.move[0][0];
 
       newBoard[move[key].rowTo][move[key].idxTo] = key;
 
       if (move[key].enPassant) {
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
-        newBoard[move[key].rowFrom][move[key].idxTo] = 0;
+        newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
       } else {
-        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = move[key].pieceTaken;
       }
 
-      setMoveBackward({
-        move: moves[currentSelectedMove.idx - 1],
-        idx: currentSelectedMove.idx - 1,
-      });
+      moveBackward = {
+        move: moves[moveFoward.idx],
+        idx: moveFoward.idx,
+      };
 
-      setMoveFoward({
-        move: moves[currentSelectedMove.idx + 1],
-        idx: currentSelectedMove.idx + 1,
-      });
+      moveFoward = {
+        move: moves[moveFoward.idx + 1],
+        idx: moveFoward.idx + 1,
+      };
 
       setBoard([...newBoard]);
     }
@@ -457,23 +529,59 @@ function MovesBoard({
                   <p>Draw</p>
                 </div>
                 <div className={classes["move-buttons"]}>
-                  <i
-                    className="bi bi-chevron-compact-left"
-                    onClick={() => retractMoves("backwards", moveBackward)}
-                  ></i>
-                  <i
-                    className="bi bi-chevron-compact-right"
-                    onClick={() => retractMoves("fowards", moveFoward)}
-                  ></i>
+                  <span onClick={resetBoard} title="go to beginning">
+                    {"<<"}
+                  </span>
+                  <span
+                    onClick={() => retractMoves("backwards")}
+                    className={classes.backwards}
+                    title="backwards"
+                  >
+                    {"<"}
+                  </span>
+                  <span
+                    onClick={() => retractMoves("forwards")}
+                    className={classes.forwards}
+                    title="forwards"
+                  >
+                    {">"}
+                  </span>
+                  <span onClick={returnToLatest} title="go to last move">
+                    {">>"}
+                  </span>
                 </div>
               </div>
             ) : (
-              <button
-                className={classes["play-button"]}
-                onClick={showTimeOptions}
-              >
-                New Game
-              </button>
+              <div className={classes["endgame-actions"]}>
+                <button
+                  className={classes["play-button"]}
+                  onClick={showTimeOptions}
+                >
+                  New Game
+                </button>
+                <div className={classes["move-buttons"]}>
+                  <span onClick={resetBoard} title="go to beginning">
+                    {"<<"}
+                  </span>
+                  <span
+                    onClick={() => retractMoves("backwards")}
+                    className={classes.backwards}
+                    title="backwards"
+                  >
+                    {"<"}
+                  </span>
+                  <span
+                    onClick={() => retractMoves("forwards")}
+                    className={classes.forwards}
+                    title="forwards"
+                  >
+                    {">"}
+                  </span>
+                  <span onClick={returnToLatest} title="go to last move">
+                    {">>"}
+                  </span>
+                </div>
+              </div>
             )}
           </div>
         </div>
