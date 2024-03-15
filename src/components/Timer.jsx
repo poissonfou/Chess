@@ -10,6 +10,8 @@ let miliseconds;
 let seconds;
 let minutes;
 let date;
+let addIncrement = false;
+let currentTime;
 
 function Timer({ color }) {
   let dispatch = useDispatch();
@@ -38,7 +40,8 @@ function Timer({ color }) {
   minutes = date.getMinutes();
 
   function getTime() {
-    newTime = JSON.parse(JSON.stringify(timer)) - 1000;
+    newTime = JSON.parse(JSON.stringify(timer)) - 500;
+    currentTime = newTime;
 
     clearInterval(deadline);
 
@@ -46,9 +49,16 @@ function Timer({ color }) {
   }
 
   if (isActive) {
-    deadline = setInterval(getTime, 1000);
+    deadline = setInterval(getTime, 500);
   } else {
     clearInterval(deadline);
+    if (!addIncrement && timer == currentTime) addIncrement = true;
+    if (addIncrement && increment !== 0) {
+      setTimer(() => {
+        addIncrement = false;
+        return timer + increment;
+      });
+    }
   }
 
   useEffect(() => {

@@ -5,8 +5,8 @@ let turn = { turn: null };
 let hasEnded = { hasEnded: false, showPopup: false };
 let timer = {
   white: false,
-  forceRenderWhite: 5,
   black: false,
+  forceRenderWhite: 5,
   forceRenderBlack: 2,
   time: {
     minutes: 600000,
