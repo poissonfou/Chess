@@ -38,14 +38,17 @@ function Timer({ color }) {
   minutes = date.getMinutes();
 
   function getTime() {
-    newTime = timer - 1000;
+    newTime = JSON.parse(JSON.stringify(timer)) - 1000;
 
     clearInterval(deadline);
+
     setTimer(newTime);
   }
 
   if (isActive) {
     deadline = setInterval(getTime, 1000);
+  } else {
+    clearInterval(deadline);
   }
 
   // if (isActive == false && deadline !== undefined) {
@@ -86,7 +89,13 @@ function Timer({ color }) {
   }
 
   return (
-    <div className={classes.timer}>
+    <div
+      className={
+        isActive
+          ? `${classes.timer} ${classes["timer-highlight"]}`
+          : `${classes.timer}`
+      }
+    >
       {timer == -1 ? <p>0:00</p> : <p>{`${minutes}:${seconds}`}</p>}
     </div>
   );

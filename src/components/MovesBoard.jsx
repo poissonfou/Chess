@@ -1,4 +1,5 @@
 import classes from "./MovesBoard.module.css";
+import { resetPiecesTaken } from "../helper/helper";
 import arrow from "../assets/arrow-right-short.svg";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -10,7 +11,22 @@ import {
 } from "../store";
 import { useState, useRef } from "react";
 
-function MovesBoard({ board, setBoard }) {
+function MovesBoard({
+  initialBoard,
+  board,
+  setBoard,
+  piecesTaken,
+  fullLogMoves,
+  moveBackward,
+  moveFoward,
+  setMoveFoward,
+  setMoveBackward,
+}) {
+  let moves = useSelector((state) => state.moves.moves);
+  let turn = useSelector((state) => state.turn.turn);
+  let hasEnded = useSelector((state) => state.hasEnded.hasEnded);
+  let showPopup = useSelector((state) => state.hasEnded.showPopup);
+
   const [selectedTime, setSelectedTime] = useState("10:00");
   const [validInput, setvalidInput] = useState(true);
   const [AbandonPopup, setAbandonPopup] = useState(false);
@@ -20,13 +36,77 @@ function MovesBoard({ board, setBoard }) {
   let secondsRef = useRef(0);
   let incrementRef = useRef(0);
 
-  let moves = useSelector((state) => state.moves.moves);
-  let turn = useSelector((state) => state.turn.turn);
-  let hasEnded = useSelector((state) => state.hasEnded.hasEnded);
-  let showPopup = useSelector((state) => state.hasEnded.showPopup);
   let dispatch = useDispatch();
   let movesBlack = [];
   let movesWhite = [];
+  let extraMargin = "";
+  let lastMove = [];
+  let propMoveBackward = moveBackward;
+  let propMoveFoward = moveFoward;
+
+  function retractMoves(direction, currentSelectedMove) {
+    if (direction == "backwards") {
+      if (currentSelectedMove.idx == -1) return;
+
+      console.log("we are here");
+
+      const move = fullLogMoves[currentSelectedMove.idx];
+      let newBoard = JSON.parse(JSON.stringify(board));
+      let key = currentSelectedMove.move[0][0];
+
+      newBoard[move[key].rowFrom][move[key].idxFrom] = key;
+      console.log(newBoard);
+      if (move[key].enPassant) {
+        newBoard[move[key].rowTo][move[key].idxTo] = 0;
+        newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
+      } else {
+        newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
+      }
+
+      setMoveBackward({
+        move: moves[currentSelectedMove.idx - 1],
+        idx: currentSelectedMove.idx - 1,
+      });
+
+      setMoveFoward({
+        move: moves[currentSelectedMove.idx],
+        idx: currentSelectedMove.idx,
+      });
+
+      setBoard([...newBoard]);
+    } else {
+      if (currentSelectedMove.idx > moves.length - 1) return;
+
+      console.log(currentSelectedMove, currentMove);
+
+      console.log("we are here");
+
+      const move = fullLogMoves[currentSelectedMove.idx];
+      let newBoard = JSON.parse(JSON.stringify(board));
+      let key = currentSelectedMove.move[0][0];
+
+      newBoard[move[key].rowTo][move[key].idxTo] = key;
+
+      if (move[key].enPassant) {
+        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
+        newBoard[move[key].rowFrom][move[key].idxTo] = 0;
+      } else {
+        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
+      }
+
+      setMoveBackward({
+        move: moves[currentSelectedMove.idx - 1],
+        idx: currentSelectedMove.idx - 1,
+      });
+
+      setMoveFoward({
+        move: moves[currentSelectedMove.idx + 1],
+        idx: currentSelectedMove.idx + 1,
+      });
+
+      setBoard([...newBoard]);
+    }
+  }
 
   function authInput(event) {
     let isNumber;
@@ -108,7 +188,8 @@ function MovesBoard({ board, setBoard }) {
   function showTimeOptions() {
     console.log("we are here");
     dispatch(movesActions.empty());
-    setBoard([...board]);
+    setBoard([...initialBoard]);
+    resetPiecesTaken(piecesTaken);
     dispatch(
       timerActions.setTime({
         minutes: 600000,
@@ -142,15 +223,31 @@ function MovesBoard({ board, setBoard }) {
   }
 
   if (moves.length !== 0) {
-    movesWhite = moves.filter((move) => {
+    movesWhite = moves.filter((move, index) => {
       let key = move[0];
-      return key[0].includes("w");
+      let isValid = key[0].includes("w");
+
+      if (isValid && index == moves.length - 1) {
+        lastMove = { move, index };
+      }
+
+      return isValid;
     });
 
-    movesBlack = moves.filter((move) => {
+    movesBlack = moves.filter((move, index) => {
       let key = move[0];
-      return key[0].includes("b") && !key[0].includes("w");
+      let isValid = key[0].includes("b") && !key[0].includes("w");
+
+      if (isValid && index == moves.length - 1) {
+        lastMove = { move, index: index + 2 };
+      }
+
+      return isValid;
     });
+  }
+
+  if (movesBlack.length === 0) {
+    extraMargin = classes["extra-margin"];
   }
 
   return (
@@ -247,27 +344,41 @@ function MovesBoard({ board, setBoard }) {
             <h1>Moves</h1>
             <div
               className={
-                movesWhite.length > 8
-                  ? `${classes["entrys"]} ${classes.overflow}`
-                  : `${classes["entrys"]}`
+                movesWhite.length > 7
+                  ? `${classes["entrys"]} ${classes.overflow} ${extraMargin}`
+                  : `${classes["entrys"]} ${extraMargin}`
               }
             >
               {movesWhite.length > 0 && (
                 <div>
                   <ol className={classes["entry-white"]}>
-                    {movesWhite.map((move, index) => (
-                      <li key={index}>
-                        <span>{index + 1 + " - "}</span>
-                        <div
-                          className={`${classes[move[0][0]]} ${
-                            classes["piece"]
-                          } `}
-                        ></div>
+                    {movesWhite.map((move, index) => {
+                      let highlightLastMove =
+                        JSON.stringify(move) == JSON.stringify(lastMove.move) &&
+                        index == movesWhite.length - 1;
 
-                        {move[0][1]}
-                        {move[0][2]}
-                      </li>
-                    ))}
+                      return (
+                        <li key={index}>
+                          <span>{index + 1 + " - "}</span>
+                          <div
+                            className={
+                              highlightLastMove
+                                ? `${classes["highlight-last-move"]}`
+                                : ``
+                            }
+                          >
+                            <div
+                              className={`${classes[move[0][0]]} ${
+                                classes["piece"]
+                              } ${classes["adjust-white-size"]}`}
+                            ></div>
+
+                            {move[0][1]}
+                            {move[0][2]}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ol>
                 </div>
               )}
@@ -275,17 +386,36 @@ function MovesBoard({ board, setBoard }) {
               {movesBlack.length > 0 && (
                 <div>
                   <ul className={classes["entry-black"]}>
-                    {movesBlack.map((move, index) => (
-                      <li key={index}>
-                        <div
-                          className={`${classes[move[0][0]]} ${
-                            classes["piece"]
-                          } `}
-                        ></div>
-                        {move[0][1]}
-                        {move[0][2]}
-                      </li>
-                    ))}
+                    {movesBlack.map((move, index) => {
+                      let highlightLastMove =
+                        JSON.stringify(move) == JSON.stringify(lastMove.move) &&
+                        index == movesBlack.length - 1;
+
+                      return (
+                        <li
+                          key={index}
+                          className={
+                            highlightLastMove
+                              ? `${classes["highlight-last-move"]}`
+                              : ``
+                          }
+                        >
+                          <div
+                            className={
+                              JSON.stringify(move) ==
+                                JSON.stringify(lastMove.move) &&
+                              index == lastMove.index
+                                ? `${classes[move[0][0]]} ${classes["piece"]} ${
+                                    classes["highlight-last-move"]
+                                  }`
+                                : `${classes[move[0][0]]} ${classes["piece"]} `
+                            }
+                          ></div>
+                          {move[0][1]}
+                          {move[0][2]}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
@@ -300,11 +430,11 @@ function MovesBoard({ board, setBoard }) {
                     <div className={classes["abandon-popup"]}>
                       <div onClick={() => abandonGame("black")}>
                         <div className={classes.white}></div>
-                        <p className={classes.test}>White</p>
+                        <p>White</p>
                       </div>
                       <div onClick={() => abandonGame("white")}>
                         <div className={classes.black}></div>
-                        <p className={classes.test}> Black</p>
+                        <p> Black</p>
                       </div>
                     </div>
                   )}
@@ -325,6 +455,16 @@ function MovesBoard({ board, setBoard }) {
                     </div>
                   )}
                   <p>Draw</p>
+                </div>
+                <div className={classes["move-buttons"]}>
+                  <i
+                    className="bi bi-chevron-compact-left"
+                    onClick={() => retractMoves("backwards", moveBackward)}
+                  ></i>
+                  <i
+                    className="bi bi-chevron-compact-right"
+                    onClick={() => retractMoves("fowards", moveFoward)}
+                  ></i>
                 </div>
               </div>
             ) : (

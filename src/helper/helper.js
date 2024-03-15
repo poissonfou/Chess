@@ -14,6 +14,11 @@ export function setPiecesTaken(turn, final, board, piecesTaken) {
     : piecesTaken.white.push(board[final.row][final.idx]);
 }
 
+export function resetPiecesTaken(piecesTaken) {
+  piecesTaken.black = [];
+  piecesTaken.white = [];
+}
+
 export function authDiagonal(board, initial, final, piece) {
   let start = final.idx < initial.idx ? final.idx : initial.idx;
   let end = final.idx > initial.idx ? final.idx : initial.idx;
@@ -222,7 +227,88 @@ export function checkHorses(direction, kingsPosition, board, identifierKnight) {
   };
 }
 
-export function isChecking(board, kingsPosition, identifier) {
+function canDiagonalBeCovered(
+  board,
+  piecesChecking,
+  kingsPosition,
+  opositeIdentifier,
+  identifier,
+  row,
+  idx
+) {
+  console.log(row, idx);
+  if (identifier == "b") {
+    if (board[row + 1][idx] == "wp") {
+      let newBoard = JSON.parse(JSON.stringify(board));
+      newBoard[piecesChecking[0].row][piecesChecking[0].idx] = "bq";
+      newBoard[row][idx] = "wp";
+      newBoard[row + 1][idx] = 0;
+
+      let canBeCovered = isChecking(newBoard, kingsPosition, opositeIdentifier);
+
+      return !canBeCovered.length ? true : false;
+    }
+  } else {
+    if (board[row - 1][idx] == "wp") {
+      let newBoard = JSON.parse(JSON.stringify(board));
+      newBoard[piecesChecking[0].row][piecesChecking[0].idx] = "wq";
+      newBoard[row][idx] = "bp";
+
+      let canBeCovered = isChecking(newBoard, kingsPosition, opositeIdentifier);
+
+      return !canBeCovered.length ? true : false;
+    }
+  }
+}
+
+function canHorizontalBeCovered(
+  board,
+  piecesChecking,
+  kingsPosition,
+  opositeIdentifier,
+  identifier,
+  idx
+) {
+  if (identifier == "b") {
+    if (board[kingsPosition.row + 1][idx] == "wp") {
+      let newBoard = JSON.parse(JSON.stringify(board));
+      newBoard[piecesChecking[0].row][piecesChecking[0].idx] = "bh";
+      newBoard[piecesChecking[0].row][idx] = "wp";
+
+      let canBeCovered = isChecking(
+        newBoard,
+        kingsPosition,
+        opositeIdentifier,
+        false
+      );
+
+      if (!canBeCovered.length) return true;
+    }
+  } else {
+    if (board[kingsPosition.row - 1][idx] == "bp") {
+      let newBoard = JSON.parse(JSON.stringify(board));
+      newBoard[piecesChecking[0].row][piecesChecking[0].idx] = "wh";
+      newBoard[piecesChecking[0].row][idx] = "bp";
+
+      let canBeCovered = isChecking(
+        newBoard,
+        kingsPosition,
+        opositeIdentifier,
+        false
+      );
+
+      if (!canBeCovered.length) return true;
+    }
+  }
+  return false;
+}
+
+export function isChecking(
+  board,
+  kingsPosition,
+  identifier,
+  runPawnCheck = true
+) {
   let start;
   let end;
   let piecesAttacking = [];
@@ -239,36 +325,34 @@ export function isChecking(board, kingsPosition, identifier) {
   //checking pawns
   piece = board[kingsPosition.row][kingsPosition.idx];
 
-  if (piece !== 0) {
+  if (piece !== 0 && runPawnCheck) {
     if (piece.indexOf("w") !== -1) {
-      if (
-        board[kingsPosition.row - 1][kingsPosition.idx + 1] == "bp" ||
-        board[kingsPosition.row - 1][kingsPosition.idx - 1] == "bp"
-      ) {
+      if (kingsPosition.row - 1 > 1) {
         if (board[kingsPosition.row - 1][kingsPosition.idx + 1] == "bp") {
           row = kingsPosition.row - 1;
           idx = kingsPosition.idx + 1;
-        } else {
+          piecesAttacking.push({ row, idx });
+        } else if (
+          board[kingsPosition.row - 1][kingsPosition.idx - 1] == "bp"
+        ) {
           row = kingsPosition.row - 1;
           idx = kingsPosition.idx - 1;
+          piecesAttacking.push({ row, idx });
         }
-
-        piecesAttacking.push({ row, idx });
       }
     } else {
-      if (
-        board[kingsPosition.row + 1][kingsPosition.idx + 1] == "wp" ||
-        board[kingsPosition.row + 1][kingsPosition.idx - 1] == "wp"
-      ) {
+      if (kingsPosition.row + 1 < 6) {
         if (board[kingsPosition.row + 1][kingsPosition.idx + 1] == "wp") {
           row = kingsPosition.row + 1;
           idx = kingsPosition.idx + 1;
-        } else {
+          piecesAttacking.push({ row, idx });
+        } else if (
+          board[kingsPosition.row + 1][kingsPosition.idx - 1] == "wp"
+        ) {
           row = kingsPosition.row + 1;
           idx = kingsPosition.idx - 1;
+          piecesAttacking.push({ row, idx });
         }
-
-        piecesAttacking.push({ row, idx });
       }
     }
   }
@@ -331,6 +415,7 @@ export function isChecking(board, kingsPosition, identifier) {
           idx: kingsPosition.idx,
         });
       }
+      break;
     }
   }
 
@@ -380,11 +465,11 @@ export function isChecking(board, kingsPosition, identifier) {
 }
 
 export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
-  let possibleMoves = [];
   let piecesAttacking;
-  let canBeTaken;
-  let newBoard = JSON.parse(JSON.stringify(board));
   let newKingsPosition = {};
+  let newBoard = JSON.parse(JSON.stringify(board));
+  let canBeTaken;
+  let opositeIdentifier;
 
   let kingRow;
   let finalKingRow;
@@ -394,15 +479,42 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
 
   //checking if king can move
 
-  if (kingsPosition.row == 0 && kingsPosition.idx == 4) {
+  if (kingsPosition.row == 0) {
     kingRow = kingsPosition.row + 1;
     finalKingRow = kingRow - 2;
 
     for (let j = kingRow; j > finalKingRow; j--) {
       for (let i = kingIdx; i < finalKingIdx; i++) {
+        if (j < 0 || i < 0) continue;
         if (j == kingsPosition.row && i == kingsPosition.idx) continue;
-        if (board[j][i] == undefined) continue;
-        if (board[j][i] == 0 || board[j][i].includes(identifier)) {
+        if (board[j][i] == 0 || board[j][i][0] == identifier) {
+          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
+          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
+
+          newKingsPosition.row = j;
+          newKingsPosition.idx = i;
+
+          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
+
+          newBoard = JSON.parse(JSON.stringify(board));
+
+          if (piecesAttacking.length) {
+            continue;
+          }
+
+          return false;
+        }
+      }
+    }
+  } else {
+    kingRow = kingsPosition.row - 1;
+    finalKingRow = kingRow + 2;
+
+    for (let j = kingRow; j <= finalKingRow; j++) {
+      for (let i = kingIdx; i <= finalKingIdx; i++) {
+        if (j > 7 || i > 7) continue;
+        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+        if (board[j][i] == 0 || board[j][i][0] == identifier) {
           newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
           newBoard[kingsPosition.row][kingsPosition.idx] = 0;
 
@@ -423,86 +535,341 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
     }
   }
 
-  if (kingsPosition.row == 7 && kingsPosition.idx == 4) {
-    kingRow = kingsPosition.row - 1;
-    finalKingRow = kingRow + 2;
-  } else {
-    kingRow = kingsPosition.row - 1;
-    finalKingRow = kingRow + 2;
-  }
+  if (piecesChecking.length >= 2) return true;
 
-  console.log(kingRow, finalKingRow, kingIdx, finalKingIdx);
+  opositeIdentifier = identifier == "w" ? "b" : "w";
 
-  for (let j = kingRow; j <= finalKingRow; j++) {
-    for (let i = kingIdx; i <= finalKingIdx; i++) {
-      if (j == kingsPosition.row && i == kingsPosition.idx) continue;
-      if (board[j][i] == undefined) continue;
-      if (board[j][i] == 0 || board[j][i].includes(identifier)) {
-        newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
-        newBoard[kingsPosition.row][kingsPosition.idx] = 0;
+  //cheking if piece can be taken
+  canBeTaken = isChecking(board, piecesChecking[0], opositeIdentifier);
 
-        newKingsPosition.row = j;
-        newKingsPosition.idx = i;
+  if (canBeTaken.length) return false;
 
-        piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
+  //checking if piece can be covered
 
-        newBoard = JSON.parse(JSON.stringify(board));
+  //KNIGHT AND PAWNS
+  if (
+    board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "p" ||
+    board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "n"
+  )
+    return true;
 
-        if (piecesAttacking.length) {
-          continue;
-        }
+  let idx, row;
 
-        return false;
-      }
-    }
-  }
+  //BISHOP
+  if (board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "b") {
+    idx =
+      kingsPosition.idx < piecesChecking[0].idx
+        ? piecesChecking[0].idx - 1
+        : piecesChecking[0].idx + 1;
 
-  if (!possibleMoves.length) {
-    if (piecesChecking.length >= 2) return true;
+    row =
+      kingsPosition.row < piecesChecking[0].row
+        ? piecesChecking[0].row - 1
+        : piecesChecking[0].row + 1;
 
-    identifier = identifier == "w" ? "b" : "w";
+    if (kingsPosition.idx < piecesChecking[0].idx) {
+      for (let i = idx; i > kingsPosition.idx; i--) {
+        canBeTaken = isChecking(
+          board,
+          { row: row, idx: i },
+          opositeIdentifier,
+          false
+        );
 
-    canBeTaken = isChecking(board, piecesChecking[0], identifier);
+        if (
+          canDiagonalBeCovered(
+            board,
+            piecesChecking,
+            kingsPosition,
+            opositeIdentifier,
+            identifier,
+            row,
+            i
+          )
+        )
+          return false;
 
-    if (canBeTaken.length) return false;
-
-    identifier = identifier == "w" ? "b" : "w";
-
-    if (
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "p" ||
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q"
-    )
-      return true;
-
-    let idx, row;
-
-    if (
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "b" ||
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q"
-    ) {
-      idx = piecesChecking[0].idx + 1;
-      row = piecesChecking[0].row + 1;
-      for (let i = idx; i <= kingsPosition.idx; i++) {
-        canBeTaken = isChecking(board, { row: row, idx: i }, identifier);
         if (canBeTaken.length) return false;
-        row++;
+        if (kingsPosition.row < piecesChecking[0].row) {
+          row++;
+        } else {
+          row--;
+        }
+      }
+    } else {
+      for (let i = idx; i < kingsPosition.idx; i++) {
+        canBeTaken = isChecking(
+          board,
+          { row: row, idx: i },
+          opositeIdentifier,
+          false
+        );
+
+        if (
+          canDiagonalBeCovered(
+            board,
+            piecesChecking,
+            kingsPosition,
+            opositeIdentifier,
+            identifier,
+            row,
+            i
+          )
+        )
+          return false;
+
+        if (canBeTaken.length) return false;
+        if (kingsPosition.row < piecesChecking[0].row) {
+          row++;
+        } else {
+          row--;
+        }
       }
     }
+  }
 
-    if (
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "h" ||
-      board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q"
-    ) {
-      row = piecesChecking[0].row + 1;
+  // HOOKS
+  if (board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "h") {
+    //checking vertical
+    row =
+      kingsPosition.row < piecesChecking[0].row
+        ? piecesChecking[0].row - 1
+        : piecesChecking[0].row + 1;
 
-      for (let i = piecesChecking[0].row; i < kingsPosition.row; i++) {
+    if (kingsPosition.row < piecesChecking[0].row) {
+      for (let i = row; i < kingsPosition.row; i++) {
         canBeTaken = isChecking(
           board,
           { row: i, idx: piecesChecking[0].idx },
-          identifier
+          opositeIdentifier
         );
 
         if (canBeTaken.length) return false;
+      }
+    } else {
+      for (let i = row; i > kingsPosition.row; i--) {
+        canBeTaken = isChecking(
+          board,
+          { row: i, idx: piecesChecking[0].idx },
+          opositeIdentifier
+        );
+
+        if (canBeTaken.length) return false;
+      }
+    }
+
+    //checking horizontal
+    idx =
+      kingsPosition.idx < piecesChecking[0].idx
+        ? piecesChecking[0].idx + 1
+        : piecesChecking[0].idx - 1;
+
+    if (kingsPosition.idx < piecesChecking[0].idx) {
+      for (let i = idx; i < kingsPosition.idx; i++) {
+        canBeTaken = isChecking(
+          board,
+          { row: kingsPosition.row, idx: i },
+          opositeIdentifier,
+          false
+        );
+
+        if (
+          canHorizontalBeCovered(
+            board,
+            piecesChecking,
+            kingsPosition,
+            opositeIdentifier,
+            identifier,
+            i
+          )
+        )
+          return false;
+
+        if (canBeTaken.length) return false;
+      }
+    } else {
+      for (let i = idx; i > kingsPosition.idx; i--) {
+        canBeTaken = isChecking(
+          board,
+          { row: kingsPosition.row, idx: i },
+          opositeIdentifier,
+          false
+        );
+
+        if (
+          canHorizontalBeCovered(
+            board,
+            piecesChecking,
+            kingsPosition,
+            opositeIdentifier,
+            identifier,
+            i
+          )
+        )
+          return false;
+
+        if (canBeTaken.length) return false;
+      }
+    }
+  }
+
+  //  QUEEN
+  if (board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q") {
+    //checking horizontal
+    if (piecesChecking[0].row == kingsPosition.row) {
+      idx =
+        kingsPosition.idx < piecesChecking[0].idx
+          ? piecesChecking[0].idx + 1
+          : piecesChecking[0].idx - 1;
+
+      if (kingsPosition.idx < piecesChecking[0].idx) {
+        for (let i = idx; i < kingsPosition.idx; i++) {
+          canBeTaken = isChecking(
+            board,
+            { row: kingsPosition.row, idx: i },
+            opositeIdentifier,
+            false
+          );
+
+          if (
+            canHorizontalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              i
+            )
+          )
+            return false;
+
+          if (canBeTaken.length) return false;
+        }
+      } else {
+        for (let i = idx; i > kingsPosition.idx; i--) {
+          canBeTaken = isChecking(
+            board,
+            { row: kingsPosition.row, idx: i },
+            opositeIdentifier,
+            false
+          );
+
+          if (
+            canHorizontalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              i
+            )
+          )
+            return false;
+
+          if (canBeTaken.length) return false;
+        }
+      }
+    } else if (piecesChecking[0].idx == kingsPosition.idx) {
+      //checking vertical
+      row =
+        kingsPosition.row < piecesChecking[0].row
+          ? piecesChecking[0].row - 1
+          : piecesChecking[0].row + 1;
+
+      if (kingsPosition.row < piecesChecking[0].row) {
+        for (let i = row; i < kingsPosition.row; i++) {
+          canBeTaken = isChecking(
+            board,
+            { row: i, idx: piecesChecking[0].idx },
+            opositeIdentifier,
+            false
+          );
+
+          if (canBeTaken.length) return false;
+        }
+      } else {
+        for (let i = row; i > kingsPosition.row; i--) {
+          canBeTaken = isChecking(
+            board,
+            { row: i, idx: piecesChecking[0].idx },
+            opositeIdentifier,
+            false
+          );
+
+          if (canBeTaken.length) return false;
+        }
+      }
+    } else {
+      //checking diagonal
+      console.log("checking diagonal");
+      idx =
+        kingsPosition.idx < piecesChecking[0].idx
+          ? piecesChecking[0].idx - 1
+          : piecesChecking[0].idx + 1;
+
+      row =
+        kingsPosition.row < piecesChecking[0].row
+          ? piecesChecking[0].row - 1
+          : piecesChecking[0].row + 1;
+
+      if (kingsPosition.idx < piecesChecking[0].idx) {
+        for (let i = idx; i > kingsPosition.idx; i--) {
+          canBeTaken = isChecking(
+            board,
+            { row: row, idx: i },
+            opositeIdentifier,
+            false
+          );
+
+          if (
+            canDiagonalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              row,
+              i
+            )
+          )
+            return false;
+
+          if (canBeTaken.length) return false;
+          if (kingsPosition.row < piecesChecking[0].row) {
+            row++;
+          } else {
+            row--;
+          }
+        }
+      } else {
+        for (let i = idx; i < kingsPosition.idx; i++) {
+          canBeTaken = isChecking(
+            board,
+            { row: row, idx: i },
+            opositeIdentifier,
+            false
+          );
+
+          if (
+            canDiagonalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              row,
+              i
+            )
+          )
+            return false;
+
+          if (canBeTaken.length) return false;
+          if (kingsPosition.row < piecesChecking[0].row) {
+            row++;
+          } else {
+            row--;
+          }
+        }
       }
     }
   }

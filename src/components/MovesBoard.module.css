@@ -15,6 +15,10 @@
   margin-top: 0.2em;
 }
 
+.extra-margin {
+  margin-left: -5.6em;
+}
+
 @media (max-width: 690px) {
   .moves-log {
     width: 25em;
@@ -39,7 +43,6 @@
   width: 100%;
   height: 21em;
   justify-content: space-around;
-  border-bottom: solid rgb(56, 56, 56) 2px;
 }
 
 .start-game-div {
@@ -80,7 +83,13 @@
   background-repeat: no-repeat;
 }
 
+.adjust-white-size {
+  width: 1.3em;
+  height: 1em;
+}
+
 .entry-white {
+  list-style: none;
   margin: 0 2em;
   width: 100%;
   padding: 0;
@@ -96,11 +105,26 @@
   margin-right: 1em;
 }
 
-.entry-white li,
+.entry-white li {
+  display: flex;
+  font-size: 1.5rem;
+  margin-bottom: 0.5em;
+  color: white;
+}
+
+.entry-white li div {
+  display: flex;
+  font-size: 1.5rem;
+  padding: 0.1em 0.1em;
+  margin-bottom: 0em;
+  color: white;
+}
+
 .entry-black li {
   display: flex;
   font-size: 1.5rem;
   margin-bottom: 0.5em;
+  padding: 0.1em 0.1em;
   color: white;
 }
 
@@ -188,6 +212,7 @@
 .actions {
   display: flex;
   flex-direction: row;
+  border-top: solid rgb(56, 56, 56) 2px;
 }
 
 .abandon-button {
@@ -269,6 +294,19 @@
   margin-left: 0.4em;
 }
 
+.move-buttons {
+  margin-top: 1.3em;
+}
+
+.move-buttons i {
+  color: white;
+  font-size: 2rem;
+}
+
+.move-buttons i:hover {
+  cursor: pointer;
+}
+
 .black {
   background-color: black;
 }
@@ -281,9 +319,9 @@
   display: flex;
 }
 
-.test {
-  margin-top: 0em;
-  padding: none;
+.highlight-last-move {
+  background-color: #3f3e3e;
+  border-radius: 3px;
 }
 
 .bp {

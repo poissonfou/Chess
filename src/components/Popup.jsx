@@ -1,4 +1,5 @@
 import classes from "./Popup.module.css";
+import { resetPiecesTaken } from "../helper/helper";
 
 import {
   movesActions,
@@ -8,7 +9,7 @@ import {
 } from "../store";
 import { useSelector, useDispatch } from "react-redux";
 
-export default function Popup({ board, setBoard }) {
+export default function Popup({ board, setBoard, piecesTaken }) {
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turn.turn);
   let minutesMiliseconds = useSelector((state) => state.timer.time.minutes);
@@ -42,6 +43,7 @@ export default function Popup({ board, setBoard }) {
         increment: increment,
       })
     );
+    resetPiecesTaken(piecesTaken);
     dispatch(timerActions.setRunningTimer("white"));
     dispatch(timerActions.changeKeys());
     dispatch(hasEndedActions.setHasEnded());

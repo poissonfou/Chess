@@ -85,6 +85,7 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
               } else {
                 color = "";
               }
+
               return onClick(piece, color, event);
             }}
           >
