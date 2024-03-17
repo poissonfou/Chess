@@ -15,6 +15,7 @@ let timer = {
   },
 };
 let promotingPiece = { idx: null, row: null, idxFrom: null };
+let games = { games: [] };
 
 const movesSlice = createSlice({
   name: "moves",
@@ -22,6 +23,9 @@ const movesSlice = createSlice({
   reducers: {
     push(state, action) {
       state.moves.push(action.payload);
+    },
+    pushAllMoves(state, action) {
+      state.moves.push(...action.payload);
     },
     pop(state) {
       state.moves.pop();
@@ -95,6 +99,22 @@ const hasEndedSlice = createSlice({
   },
 });
 
+const gamesSlice = createSlice({
+  name: "games",
+  initialState: games,
+  reducers: {
+    addGame(state, action) {
+      state.games.push({
+        moves: action.payload.moves,
+        fullLogMoves: action.payload.fullLogMoves,
+        result: action.payload.result,
+        date: action.payload.date,
+        time: action.payload.time,
+      });
+    },
+  },
+});
+
 export const store = configureStore({
   reducer: {
     moves: movesSlice.reducer,
@@ -102,6 +122,7 @@ export const store = configureStore({
     timer: timerSlice.reducer,
     promotingPiece: promotingPieceSlice.reducer,
     hasEnded: hasEndedSlice.reducer,
+    games: gamesSlice.reducer,
   },
 });
 
@@ -110,3 +131,4 @@ export const turnActions = turnSlice.actions;
 export const timerActions = timerSlice.actions;
 export const promotingPieceActions = promotingPieceSlice.actions;
 export const hasEndedActions = hasEndedSlice.actions;
+export const gamesActions = gamesSlice.actions;

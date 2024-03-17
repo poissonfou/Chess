@@ -3,6 +3,7 @@ import { turnActions, timerActions, hasEndedActions } from "../store";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { saveGame } from "../helper/helper";
 
 let newTime;
 
@@ -13,13 +14,14 @@ let date;
 let addIncrement = false;
 let currentTime;
 
-function Timer({ color }) {
+function Timer({ color, fullLogMoves }) {
   let dispatch = useDispatch();
   let minutesMiliseconds = useSelector((state) => state.timer.time.minutes);
   let secondsInput = useSelector((state) => state.timer.time.seconds);
   let increment = useSelector((state) => state.timer.time.increment);
   let turn = useSelector((state) => state.turn.turn);
   let isActive = useSelector((state) => state.timer[color]);
+  let moves = useSelector((state) => state.moves.moves);
 
   const [timer, setTimer] = useState(minutesMiliseconds + secondsInput);
   let deadline;
@@ -64,12 +66,24 @@ function Timer({ color }) {
   useEffect(() => {
     if (timer == 0 && turn !== null) {
       console.log("game ended");
-      //solve this problem later
 
       dispatch(turnActions.changeTurn(color == "white" ? "black" : "white"));
       dispatch(hasEndedActions.setHasEnded());
       dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
+
+      saveGame(
+        dispatch,
+        fullLogMoves,
+        color == "white" ? "0-1" : "1-0",
+        moves,
+        0,
+        {
+          minutesMiliseconds,
+          secondsInput,
+          increment,
+        }
+      );
     }
   }, [timer]);
 

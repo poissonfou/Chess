@@ -39,21 +39,56 @@
 
 .entrys {
   display: flex;
-  flex-direction: row;
-  width: 100%;
+  width: auto;
   height: 21em;
   justify-content: space-around;
+}
+
+.entrys div {
+  display: flex;
 }
 
 .start-game-div {
   display: flex;
   flex-direction: column;
-  padding-left: 1em;
-  padding-right: 1em;
-  padding-top: 1.5em;
-  padding-bottom: 1.5em;
+  padding: 1em 1.2em;
   border-radius: 5px;
   background-color: rgba(116, 115, 115, 0.2);
+}
+
+.tabs {
+  display: flex;
+  width: 23.95em;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.tabs div {
+  color: rgb(243, 243, 243);
+  font-size: 1.3rem;
+  padding: 0 0 0.5em 0em;
+  margin: 0;
+}
+
+.tabs div:hover {
+  cursor: pointer;
+}
+
+.tabs .play {
+  margin-right: 0.5em;
+}
+
+.tabs div h3 {
+  margin-top: 0;
+  height: 0.2em;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.underline h3 {
+  color: white;
 }
 
 .selected-time {
@@ -89,17 +124,12 @@
   background-repeat: no-repeat;
 }
 
-.adjust-white-size {
-  width: 1.3em;
-  height: 1em;
-}
-
 .entry-white {
   list-style: none;
   margin: 0 2em;
   width: 100%;
   padding: 0;
-  margin-right: 0em;
+  margin-right: 6em;
   margin-left: 1em;
 }
 
@@ -126,28 +156,41 @@
   color: white;
 }
 
+.entry-white li div div {
+  width: 1.3em;
+  height: 1em;
+}
+
 .entry-black li {
   display: flex;
   font-size: 1.5rem;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.4em;
   padding: 0.1em 0.1em;
   color: white;
+}
+
+.entry-black li div {
+  width: 1.5em;
+  height: 1.3em;
 }
 
 .overflow {
   overflow-y: scroll;
 }
 
-.entrys::-webkit-scrollbar {
+.entrys::-webkit-scrollbar,
+.games-log::-webkit-scrollbar {
   width: 10px;
   display: block;
 }
 
-.entrys::-webkit-scrollbar-track {
+.entrys::-webkit-scrollbar-track,
+.games-log::-webkit-scrollbar-track {
   background-color: rgba(116, 115, 115, 0.2);
 }
 
-.entrys::-webkit-scrollbar-thumb {
+.entrys::-webkit-scrollbar-thumb,
+.games-log::-webkit-scrollbar-thumb {
   background: #535353;
   border-radius: 5px;
 }
@@ -345,9 +388,44 @@
   display: flex;
 }
 
-.highlight-last-move {
+.highlight {
   background-color: #3f3e3e;
   border-radius: 3px;
+}
+
+.adjust-margin {
+  margin-right: 3.3em;
+}
+
+.games-log {
+  height: 30rem;
+}
+
+.games-log h2 {
+  color: white;
+  text-align: center;
+}
+
+.game {
+  display: flex;
+  margin-bottom: 0.5em;
+}
+
+.game:hover {
+  cursor: pointer;
+}
+
+.game div {
+  margin-left: 2em;
+  border-left: 1px solid #3f3e3e;
+  padding-left: 2em;
+  color: white;
+}
+
+.game h1 {
+  color: rgb(17, 124, 17);
+  text-shadow: -2px -1px rgb(14, 90, 14);
+  padding-left: 0.5em;
 }
 
 .bp {

@@ -20,9 +20,10 @@ import {
   hasEndedActions,
 } from "../store";
 
-import { getCoords, isChecking, isCheckMate } from "../helper/helper";
+import { getCoords, isChecking, isCheckMate, saveGame } from "../helper/helper";
 
 import BoardRow from "./BoardRow";
+import { useGameInfo } from "../hooks/useGameInfo";
 
 let kingsPosition = {
   white: { row: 7, idx: 4, hasMoved: false },
@@ -43,9 +44,11 @@ let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 let promoting = false;
 
 function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
+  let { moves, minutesMiliseconds, secondsInput, increment } = useGameInfo();
   const dispatch = useDispatch();
   const [selectedPiece, setSelectedPiece] = useState([]);
   let turn = useSelector((state) => state.turn.turn);
+
   let promotingPiece = useSelector((state) => state.promotingPiece);
 
   function promotePiece(piece) {
@@ -65,6 +68,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
     moveLog[selectedPiece[0].piece].idxTo = idxTo;
     moveLog[selectedPiece[0].piece].pieceTaken = 0;
     moveLog[selectedPiece[0].piece].enPassant = false;
+    moveLog[selectedPiece[0].piece].castling = { castling: false, side: null };
 
     if (board[promotingPiece.row][promotingPiece.idx] == 0) {
       move.push(boardLetters[promotingPiece.idx]);
@@ -254,8 +258,6 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
         newBoard[rowTo][+idxTo + 1] = turn == "white" ? "wh" : "bh";
         newBoard[rowTo][+idxTo - 2] = 0;
       }
-
-      updateCastle(false, null);
     } else {
       newBoard[rowTo][idxTo] = selectedPiece[0].piece;
       newBoard[rowFrom][idxFrom] = 0;
@@ -300,12 +302,16 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       let pieceTaken;
 
       moveLog[selectedPiece[0].piece] = {};
-      moveLog[selectedPiece[0].piece].rowFrom = rowFrom;
-      moveLog[selectedPiece[0].piece].idxFrom = idxFrom;
-      moveLog[selectedPiece[0].piece].rowTo = rowTo;
-      moveLog[selectedPiece[0].piece].idxTo = idxTo;
+      moveLog[selectedPiece[0].piece].rowFrom = +rowFrom;
+      moveLog[selectedPiece[0].piece].idxFrom = +idxFrom;
+      moveLog[selectedPiece[0].piece].rowTo = +rowTo;
+      moveLog[selectedPiece[0].piece].idxTo = +idxTo;
       moveLog[selectedPiece[0].piece].pieceTaken = 0;
       moveLog[selectedPiece[0].piece].enPassant = false;
+      moveLog[selectedPiece[0].piece].castling = {
+        castling: false,
+        side: null,
+      };
 
       move.push(selectedPiece[0].piece);
 
@@ -317,6 +323,19 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
         if (piecesAttacking.length && checkMate) {
           move.push(boardLetters[idxTo]);
           move.push(boardNumber[rowTo] + "++");
+        } else if (castle.isCastling) {
+          moveLog[selectedPiece[0].piece].castling.castling = true;
+
+          if (castle.side == "queenSide") {
+            move.push("0-0-0");
+            move.push("");
+            moveLog[selectedPiece[0].piece].castling.side = "queenSide";
+          } else {
+            move.push("0-0");
+            move.push("");
+            moveLog[selectedPiece[0].piece].castling.side = "kingSide";
+          }
+          updateCastle(false, null);
         } else {
           if (enPassant) {
             moveLog[selectedPiece[0].piece].enPassant = true;
@@ -338,6 +357,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
 
         move.push(pieceTaken);
       }
+
       fullLogMoves.push(moveLog);
       dispatchMove("push", move);
     }
@@ -351,22 +371,20 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
     resetPiece();
 
     if (checkMate) {
-      console.log("game ended");
-
-      let move = [];
-      move.push("");
-
-      if (turn == "white") {
-        move.push("1-0");
-      } else {
-        move.push("0-1");
-      }
-
       piecesAttacking = [];
       checkMate = false;
       dispatch(hasEndedActions.setHasEnded());
       dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
+
+      saveGame(
+        dispatch,
+        fullLogMoves,
+        turn == "white" ? "1-0" : "0-1",
+        moves,
+        0,
+        { minutesMiliseconds, secondsInput, increment }
+      );
       return;
     }
 

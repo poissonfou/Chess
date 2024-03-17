@@ -1,5 +1,5 @@
 import classes from "./MovesBoard.module.css";
-import { resetPiecesTaken } from "../helper/helper";
+import { resetPiecesTaken, saveGame } from "../helper/helper";
 import arrow from "../assets/arrow-right-short.svg";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -13,6 +13,9 @@ import { useState, useRef, useEffect } from "react";
 
 let moveBackward, moveFoward;
 let currentBoard;
+let gameReplay = false;
+
+let currentMove;
 
 function MovesBoard({
   initialBoard,
@@ -25,23 +28,24 @@ function MovesBoard({
   let turn = useSelector((state) => state.turn.turn);
   let hasEnded = useSelector((state) => state.hasEnded.hasEnded);
   let showPopup = useSelector((state) => state.hasEnded.showPopup);
+  let games = useSelector((state) => state.games.games);
 
   const [selectedTime, setSelectedTime] = useState("10:00");
   const [validInput, setvalidInput] = useState(true);
   const [AbandonPopup, setAbandonPopup] = useState(false);
   const [DrawPopup, setDrawPopup] = useState(false);
+  const [showPlay, setShowPlay] = useState(true);
 
   let minutesRef = useRef(0);
   let secondsRef = useRef(0);
   let incrementRef = useRef(0);
 
   let dispatch = useDispatch();
-  let movesBlack = [];
-  let movesWhite = [];
-  let extraMargin = "";
-  let lastMove = [];
+  let counter = 1;
 
   useEffect(() => {
+    currentMove = undefined;
+
     moveBackward = {
       move: moves[moves.length - 1],
       idx: moves.length - 1,
@@ -59,6 +63,22 @@ function MovesBoard({
       };
     }
   }, [moves]);
+
+  function toggleTabs(val) {
+    setShowPlay(val);
+  }
+
+  function retrieveGame(index) {
+    let game = games[index];
+
+    dispatch(movesActions.pushAllMoves(game.moves));
+    fullLogMoves.push(...game.fullLogMoves);
+    setShowPlay(false);
+    dispatch(turnActions.changeTurn(""));
+    dispatch(hasEndedActions.setHasEnded());
+    gameReplay = true;
+    currentMove = 0;
+  }
 
   function returnToLatest() {
     if (moves.length == 0) return;
@@ -108,6 +128,15 @@ function MovesBoard({
         };
       }
 
+      if (gameReplay) {
+        moveBackward = {
+          move: moves[0],
+          idx: 0,
+        };
+      }
+
+      currentMove = moveBackward.idx;
+
       const move = fullLogMoves[moveBackward.idx];
       let newBoard = JSON.parse(JSON.stringify(board));
       let key = moveBackward.move[0][0];
@@ -117,6 +146,16 @@ function MovesBoard({
       if (move[key].enPassant) {
         newBoard[move[key].rowTo][move[key].idxTo] = 0;
         newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
+      } else if (move[key].castling.castling) {
+        newBoard[move[key].rowTo][move[key].idxTo] = 0;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = key;
+        if (move[key].castling.side == "queenSide") {
+          newBoard[move[key].rowTo][move[key].idxTo - 2] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo + 1] = 0;
+        } else {
+          newBoard[move[key].rowTo][move[key].idxTo + 1] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo - 1] = 0;
+        }
       } else {
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
       }
@@ -148,10 +187,20 @@ function MovesBoard({
           idx: moveBackward.idx - 1,
         };
       }
+      gameReplay = false;
     } else {
       if (moveFoward == undefined) return;
 
       if (moveFoward.idx >= moves.length) return;
+
+      if (gameReplay) {
+        moveFoward = {
+          move: moves[0],
+          idx: 0,
+        };
+      }
+
+      currentMove = moveFoward.idx;
 
       const move = fullLogMoves[moveFoward.idx];
       let newBoard = JSON.parse(JSON.stringify(board));
@@ -162,6 +211,16 @@ function MovesBoard({
       if (move[key].enPassant) {
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
         newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
+      } else if (move[key].castling.castling) {
+        newBoard[move[key].rowTo][move[key].idxTo] = key;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
+        if (move[key].castling.side == "queenSide") {
+          newBoard[move[key].rowTo][move[key].idxTo - 2] = 0;
+          newBoard[move[key].rowTo][move[key].idxTo + 1] = "wh";
+        } else {
+          newBoard[move[key].rowTo][move[key].idxTo + 1] = 0;
+          newBoard[move[key].rowTo][move[key].idxTo - 1] = "wh";
+        }
       } else {
         newBoard[move[key].rowFrom][move[key].idxFrom] = move[key].pieceTaken;
       }
@@ -177,6 +236,7 @@ function MovesBoard({
       };
 
       setBoard([...newBoard]);
+      gameReplay = false;
     }
   }
 
@@ -258,7 +318,6 @@ function MovesBoard({
   }
 
   function showTimeOptions() {
-    console.log("we are here");
     dispatch(movesActions.empty());
     setBoard([...initialBoard]);
     resetPiecesTaken(piecesTaken);
@@ -284,6 +343,7 @@ function MovesBoard({
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
     dispatch(timerActions.setRunningTimer(null));
+    saveGame(dispatch, fullLogMoves, "1/2", moves, selectedTime);
   }
 
   function abandonGame(color) {
@@ -292,122 +352,145 @@ function MovesBoard({
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
     dispatch(timerActions.setRunningTimer(null));
-  }
 
-  if (moves.length !== 0) {
-    movesWhite = moves.filter((move, index) => {
-      let key = move[0];
-      let isValid = key[0].includes("w");
-
-      if (isValid && index == moves.length - 1) {
-        lastMove = { move, index };
-      }
-
-      return isValid;
-    });
-
-    movesBlack = moves.filter((move, index) => {
-      let key = move[0];
-      let isValid = key[0].includes("b") && !key[0].includes("w");
-
-      if (isValid && index == moves.length - 1) {
-        lastMove = { move, index: index + 2 };
-      }
-
-      return isValid;
-    });
-  }
-
-  if (movesBlack.length === 0) {
-    extraMargin = classes["extra-margin"];
+    saveGame(
+      dispatch,
+      fullLogMoves,
+      color == "white" ? "1-0" : "0-1",
+      moves,
+      selectedTime
+    );
   }
 
   return (
     <div>
       {turn == null && (
         <div className={classes["start-game-div"]}>
-          <form onSubmit={setGame}>
-            <div>
-              <button type="button" className={classes["selected-time"]}>
-                {selectedTime}
-              </button>
-              <div className={classes["time-options"]}>
-                <div>
-                  <p>Bullet</p>
-                  <div className={classes["time-options-item"]}>
-                    <button id="1.0" onClick={setTimer} type="button">
-                      1 min
-                    </button>
-                    <button id="1.1" onClick={setTimer} type="button">
-                      1|1
-                    </button>
-                    <button id="1.2" onClick={setTimer} type="button">
-                      1|2
-                    </button>
+          <div className={classes.tabs}>
+            <div
+              className={
+                showPlay
+                  ? `${classes.play} ${classes.underline}`
+                  : `${classes.play}`
+              }
+            >
+              <h3 onClick={() => toggleTabs(true)}>Play</h3>
+            </div>
+            <div className={!showPlay ? ` ${classes.underline}` : ``}>
+              <h3 onClick={() => toggleTabs(false)}>Games</h3>
+            </div>
+          </div>
+          {showPlay && (
+            <form onSubmit={setGame}>
+              <div>
+                <button type="button" className={classes["selected-time"]}>
+                  {selectedTime}
+                </button>
+                <div className={classes["time-options"]}>
+                  <div>
+                    <p>Bullet</p>
+                    <div className={classes["time-options-item"]}>
+                      <button id="1.0" onClick={setTimer} type="button">
+                        1 min
+                      </button>
+                      <button id="1.1" onClick={setTimer} type="button">
+                        1|1
+                      </button>
+                      <button id="1.2" onClick={setTimer} type="button">
+                        1|2
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p>Blitz</p>
-                  <div className={classes["time-options-item"]}>
-                    <button id="3.0" onClick={setTimer} type="button">
-                      3 min
-                    </button>
-                    <button id="3.2" onClick={setTimer} type="button">
-                      3|2
-                    </button>
-                    <button id="5.0" onClick={setTimer} type="button">
-                      5 min
-                    </button>
+                  <div>
+                    <p>Blitz</p>
+                    <div className={classes["time-options-item"]}>
+                      <button id="3.0" onClick={setTimer} type="button">
+                        3 min
+                      </button>
+                      <button id="3.2" onClick={setTimer} type="button">
+                        3|2
+                      </button>
+                      <button id="5.0" onClick={setTimer} type="button">
+                        5 min
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p>Rapid</p>
-                  <div className={classes["time-options-item"]}>
-                    <button id="10.0" onClick={setTimer} type="button">
-                      10 min
-                    </button>
-                    <button id="15.10" onClick={setTimer} type="button">
-                      15|10
-                    </button>
-                    <button id="30.0" onClick={setTimer} type="button">
-                      30 min
-                    </button>
+                  <div>
+                    <p>Rapid</p>
+                    <div className={classes["time-options-item"]}>
+                      <button id="10.0" onClick={setTimer} type="button">
+                        10 min
+                      </button>
+                      <button id="15.10" onClick={setTimer} type="button">
+                        15|10
+                      </button>
+                      <button id="30.0" onClick={setTimer} type="button">
+                        30 min
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p>Custom</p>
-                  {validInput == false && <p>Please enter only numbers</p>}
-                  <div className={classes["custom-time-inputs"]}>
-                    <input
-                      name="minutes"
-                      ref={minutesRef}
-                      type="text"
-                      onChange={authInput}
-                      placeholder="minutes"
-                    />
-                    <input
-                      name="seconds"
-                      ref={secondsRef}
-                      type="text"
-                      onChange={authInput}
-                      placeholder="seconds"
-                    />
-                    <input
-                      name="increment"
-                      ref={incrementRef}
-                      onChange={authInput}
-                      type="text"
-                      placeholder="increment"
-                    />
-                    <button onClick={() => setTimer()} type="button">
-                      <img src={arrow} alt="arrow icon" />
-                    </button>
+                  <div>
+                    <p>Custom</p>
+                    {validInput == false && <p>Please enter only numbers</p>}
+                    <div className={classes["custom-time-inputs"]}>
+                      <input
+                        name="minutes"
+                        ref={minutesRef}
+                        type="text"
+                        onChange={authInput}
+                        placeholder="minutes"
+                      />
+                      <input
+                        name="seconds"
+                        ref={secondsRef}
+                        type="text"
+                        onChange={authInput}
+                        placeholder="seconds"
+                      />
+                      <input
+                        name="increment"
+                        ref={incrementRef}
+                        onChange={authInput}
+                        type="text"
+                        placeholder="increment"
+                      />
+                      <button onClick={() => setTimer()} type="button">
+                        <img src={arrow} alt="arrow icon" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
+              <button className={classes["play-button"]}>Play</button>
+            </form>
+          )}
+          {!showPlay && (
+            <div
+              className={
+                games.length > 5
+                  ? `${classes["games-log"]} ${classes.overflow}`
+                  : `${classes["games-log"]}`
+              }
+            >
+              {games.length == 0 ? (
+                <h2>No Games.</h2>
+              ) : (
+                games.map((game, index) => (
+                  <div
+                    className={classes.game}
+                    key={index}
+                    onClick={() => retrieveGame(index)}
+                  >
+                    <h1>{game.result}</h1>
+                    <div>
+                      <p>{"Date: " + game.date}</p>
+                      <p>{"Time: " + game.time}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <button className={classes["play-button"]}>Play</button>
-          </form>
+          )}
         </div>
       )}
       {turn !== null && (
@@ -416,79 +499,96 @@ function MovesBoard({
             <h1>Moves</h1>
             <div
               className={
-                movesWhite.length > 7
-                  ? `${classes["entrys"]} ${classes.overflow} ${extraMargin}`
-                  : `${classes["entrys"]} ${extraMargin}`
+                moves.length > 10
+                  ? `${classes["entrys"]} ${classes.overflow}`
+                  : `${classes["entrys"]}`
               }
             >
-              {movesWhite.length > 0 && (
+              {moves.length > 0 && (
                 <div>
-                  <ol className={classes["entry-white"]}>
-                    {movesWhite.map((move, index) => {
-                      let highlightLastMove =
-                        JSON.stringify(move) == JSON.stringify(lastMove.move) &&
-                        index == movesWhite.length - 1;
+                  <div>
+                    <ol className={classes["entry-white"]}>
+                      {moves.map((move, index) => {
+                        let adjustMargin = "";
+                        if (moves.length == 1) {
+                          adjustMargin = classes["adjust-margin"];
+                        }
 
-                      return (
-                        <li key={index}>
-                          <span>{index + 1 + " - "}</span>
-                          <div
-                            className={
-                              highlightLastMove
-                                ? `${classes["highlight-last-move"]}`
-                                : ``
-                            }
-                          >
-                            <div
-                              className={`${classes[move[0][0]]} ${
-                                classes["piece"]
-                              } ${classes["adjust-white-size"]}`}
-                            ></div>
-
-                            {move[0][1]}
-                            {move[0][2]}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              )}
-
-              {movesBlack.length > 0 && (
-                <div>
-                  <ul className={classes["entry-black"]}>
-                    {movesBlack.map((move, index) => {
-                      let highlightLastMove =
-                        JSON.stringify(move) == JSON.stringify(lastMove.move) &&
-                        index == movesBlack.length - 1;
-
-                      return (
-                        <li
-                          key={index}
-                          className={
-                            highlightLastMove
-                              ? `${classes["highlight-last-move"]}`
-                              : ``
+                        if (move[0][0][0] == "w") {
+                          let highlight;
+                          let number;
+                          if (currentMove == undefined) {
+                            highlight = index == moves.length - 1;
+                            currentMove = undefined;
+                          } else {
+                            highlight = index == currentMove;
                           }
-                        >
-                          <div
-                            className={
-                              JSON.stringify(move) ==
-                                JSON.stringify(lastMove.move) &&
-                              index == lastMove.index
-                                ? `${classes[move[0][0]]} ${classes["piece"]} ${
-                                    classes["highlight-last-move"]
-                                  }`
-                                : `${classes[move[0][0]]} ${classes["piece"]} `
-                            }
-                          ></div>
-                          {move[0][1]}
-                          {move[0][2]}
-                        </li>
-                      );
-                    })}
-                  </ul>
+
+                          if (index == 0) {
+                            number = <span>{index + 1 + " - "}</span>;
+                          } else if (index == 2) {
+                            number = <span>{index + " - "}</span>;
+                          } else {
+                            number = <span>{index - counter + " - "}</span>;
+                            counter++;
+                          }
+
+                          return (
+                            <li key={index}>
+                              {number}
+                              <div
+                                className={
+                                  highlight
+                                    ? `${classes["highlight"]} ${adjustMargin}`
+                                    : `${adjustMargin}`
+                                }
+                              >
+                                <div
+                                  className={`${classes[move[0][0]]} ${
+                                    classes["piece"]
+                                  } `}
+                                ></div>
+
+                                {move[0][1]}
+                                {move[0][2]}
+                              </div>
+                            </li>
+                          );
+                        }
+                      })}
+                    </ol>
+                  </div>
+                  <div>
+                    <ul className={classes["entry-black"]}>
+                      {moves.map((move, index) => {
+                        if (move[0][0][0] == "b") {
+                          let highlight;
+                          if (currentMove == undefined) {
+                            highlight = index == moves.length - 1;
+                            currentMove = undefined;
+                          } else {
+                            highlight = index == currentMove;
+                          }
+                          return (
+                            <li
+                              key={index}
+                              className={
+                                highlight ? `${classes["highlight"]}` : ``
+                              }
+                            >
+                              <div
+                                className={`${classes[move[0][0]]} ${
+                                  classes["piece"]
+                                } `}
+                              ></div>
+                              {move[0][1]}
+                              {move[0][2]}
+                            </li>
+                          );
+                        }
+                      })}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>

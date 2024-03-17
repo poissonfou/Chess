@@ -1,3 +1,5 @@
+import { gamesActions } from "../store";
+
 export function getCoords(event, coords) {
   let [rowTo, idxTo] = event.target.id.split(".");
   let [rowFrom, idxFrom] = coords.split(".");
@@ -875,4 +877,54 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   }
 
   return true;
+}
+
+export function saveGame(
+  dispatch,
+  fullLogMoves,
+  result,
+  moves,
+  fullTime,
+  ...timeSections
+) {
+  let time;
+  if (fullTime == 0) {
+    let miliseconds =
+      timeSections.minutesMiliseconds + timeSections.secondsInput;
+
+    let seconds = miliseconds / 1000;
+    let minutes = seconds / 60;
+
+    let dateTime = new Date();
+    dateTime.setSeconds(seconds);
+    dateTime.setMinutes(minutes);
+
+    seconds = dateTime.getSeconds();
+    minutes = dateTime.getMinutes();
+
+    if (timeSections.increment == 0) {
+      time = `${minutes}:${seconds}`;
+    } else if (increment && seconds == 0) {
+      time = `${minutes}|${timeSections.increment}`;
+    } else {
+      time = `${minutes}:${seconds}|${timeSections.increment}`;
+    }
+  } else {
+    time = fullTime;
+  }
+
+  let date = new Date();
+  let Fulldate = `${date.getDate()}/${
+    date.getMonth() + 1
+  }/${date.getFullYear()}`;
+
+  dispatch(
+    gamesActions.addGame({
+      moves,
+      fullLogMoves,
+      result,
+      date: Fulldate,
+      time,
+    })
+  );
 }

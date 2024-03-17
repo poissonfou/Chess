@@ -35,12 +35,17 @@ function App() {
   showPopup = useSelector((state) => state.hasEnded.showPopup);
   hasEnded = useSelector((state) => state.hasEnded.hasEnded);
   moves = useSelector((state) => state.moves.moves);
+  let turn = useSelector((state) => state.turn.turn);
+
+  if (hasEnded && turn !== "") {
+    fullLogMoves = [];
+  }
 
   return (
     <div className="main-div">
       <div>
         <div className="player-info">
-          <Timer key={blackKey} color={"black"} />
+          <Timer key={blackKey} color={"black"} fullLogMoves={fullLogMoves} />
           <PiecesTaken piecesTaken={piecesTaken} color="white" />
         </div>
         {showPopup && (
@@ -57,7 +62,7 @@ function App() {
           fullLogMoves={fullLogMoves}
         />
         <div className="player-info">
-          <Timer key={whiteKey} color={"white"} />
+          <Timer key={whiteKey} color={"white"} fullLogMoves={fullLogMoves} />
           <PiecesTaken piecesTaken={piecesTaken} color="black" />
         </div>
       </div>
