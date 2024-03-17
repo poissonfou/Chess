@@ -14,7 +14,13 @@ let timer = {
     increment: 0,
   },
 };
-let promotingPiece = { idx: null, row: null, idxFrom: null };
+let promotingPiece = {
+  idxTo: null,
+  rowTo: null,
+  idxFrom: null,
+  rowFrom: null,
+  pieceTaken: null,
+};
 let games = { games: [] };
 
 const movesSlice = createSlice({
@@ -79,9 +85,11 @@ const promotingPieceSlice = createSlice({
   initialState: promotingPiece,
   reducers: {
     setPiece(state, action) {
-      state.row = action.payload.row;
-      state.idx = action.payload.idx;
+      state.rowTo = action.payload.rowTo;
+      state.idxTo = action.payload.idxTo;
       state.idxFrom = action.payload.idxFrom;
+      state.rowFrom = action.payload.rowFrom;
+      state.pieceTaken = action.payload.pieceTaken;
     },
   },
 });

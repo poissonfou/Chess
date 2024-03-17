@@ -141,6 +141,12 @@ function MovesBoard({
       let newBoard = JSON.parse(JSON.stringify(board));
       let key = moveBackward.move[0][0];
 
+      if (Object.keys(move)[0] !== key) {
+        key = Object.keys(move)[0];
+      }
+
+      console.log(move, key, moveBackward.move);
+
       newBoard[move[key].rowFrom][move[key].idxFrom] = key;
 
       if (move[key].enPassant) {
@@ -150,12 +156,19 @@ function MovesBoard({
         newBoard[move[key].rowTo][move[key].idxTo] = 0;
         newBoard[move[key].rowFrom][move[key].idxFrom] = key;
         if (move[key].castling.side == "queenSide") {
-          newBoard[move[key].rowTo][move[key].idxTo - 2] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo - 2] =
+            move[key].castling.piece;
           newBoard[move[key].rowTo][move[key].idxTo + 1] = 0;
         } else {
-          newBoard[move[key].rowTo][move[key].idxTo + 1] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo + 1] =
+            move[key].castling.piece;
           newBoard[move[key].rowTo][move[key].idxTo - 1] = 0;
         }
+      } else if (move[key].promoting.promoting) {
+        console.log("we are heree", move[key].pieceTaken);
+        newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = key;
+        console.log(newBoard, newBoard[move[key].rowTo][move[key].idxTo]);
       } else {
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
       }
@@ -206,6 +219,10 @@ function MovesBoard({
       let newBoard = JSON.parse(JSON.stringify(board));
       let key = moveFoward.move[0][0];
 
+      if (Object.keys(move)[0] !== key) {
+        key = Object.keys(move)[0];
+      }
+
       newBoard[move[key].rowTo][move[key].idxTo] = key;
 
       if (move[key].enPassant) {
@@ -216,11 +233,16 @@ function MovesBoard({
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
         if (move[key].castling.side == "queenSide") {
           newBoard[move[key].rowTo][move[key].idxTo - 2] = 0;
-          newBoard[move[key].rowTo][move[key].idxTo + 1] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo + 1] =
+            move[key].castling.piece;
         } else {
           newBoard[move[key].rowTo][move[key].idxTo + 1] = 0;
-          newBoard[move[key].rowTo][move[key].idxTo - 1] = "wh";
+          newBoard[move[key].rowTo][move[key].idxTo - 1] =
+            move[key].castling.piece;
         }
+      } else if (move[key].promoting.promoting) {
+        newBoard[move[key].rowTo][move[key].idxTo] = move[key].promoting.piece;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
       } else {
         newBoard[move[key].rowFrom][move[key].idxFrom] = move[key].pieceTaken;
       }

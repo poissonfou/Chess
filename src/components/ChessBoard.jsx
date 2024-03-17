@@ -54,7 +54,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
   function promotePiece(piece) {
     let newBoard = JSON.parse(JSON.stringify(board));
 
-    newBoard[promotingPiece.row][promotingPiece.idx] = piece;
+    newBoard[promotingPiece.rowTo][promotingPiece.idxTo] = piece;
 
     let move = [];
     move.push(piece);
@@ -62,28 +62,38 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
     let moveLog = {};
 
     moveLog[selectedPiece[0].piece] = {};
-    moveLog[selectedPiece[0].piece].rowFrom = rowFrom;
-    moveLog[selectedPiece[0].piece].idxFrom = idxFrom;
-    moveLog[selectedPiece[0].piece].rowTo = rowTo;
-    moveLog[selectedPiece[0].piece].idxTo = idxTo;
+    moveLog[selectedPiece[0].piece].rowFrom = promotingPiece.rowFrom;
+    moveLog[selectedPiece[0].piece].idxFrom = promotingPiece.idxFrom;
+    moveLog[selectedPiece[0].piece].rowTo = promotingPiece.rowTo;
+    moveLog[selectedPiece[0].piece].idxTo = promotingPiece.idxTo;
     moveLog[selectedPiece[0].piece].pieceTaken = 0;
     moveLog[selectedPiece[0].piece].enPassant = false;
-    moveLog[selectedPiece[0].piece].castling = { castling: false, side: null };
+    moveLog[selectedPiece[0].piece].castling = {
+      castling: false,
+      side: null,
+      piece: null,
+    };
+    moveLog[selectedPiece[0].piece].promoting = {
+      promoting: true,
+      piece: piece,
+    };
 
-    if (board[promotingPiece.row][promotingPiece.idx] == 0) {
-      move.push(boardLetters[promotingPiece.idx]);
-      move.push(boardNumber[promotingPiece.row] + "=" + piece[1].toUpperCase());
-    } else {
+    if (promotingPiece.idxFrom !== promotingPiece.idxTo) {
       move.push(boardLetters[promotingPiece.idxFrom]);
-      moveLog[selectedPiece[0].piece].pieceTaken =
-        board[promotingPiece.row][promotingPiece.idx];
-
-      let pieceTaken =
+      moveLog[selectedPiece[0].piece].pieceTaken = promotingPiece.pieceTaken;
+      let pieceTaken_ =
         "x" +
-        boardLetters[promotingPiece.idx] +
-        boardNumber[promotingPiece.row];
-      move.push(pieceTaken + "=" + piece[1].toUpperCase());
+        boardLetters[promotingPiece.idxTo] +
+        boardNumber[promotingPiece.rowTo];
+      move.push(pieceTaken_ + "=" + piece[1].toUpperCase());
+    } else {
+      move.push(boardLetters[promotingPiece.idxTo]);
+      move.push(
+        boardNumber[promotingPiece.rowTo] + "=" + piece[1].toUpperCase()
+      );
     }
+
+    fullLogMoves.push(moveLog);
 
     setBoard([...newBoard]);
 
@@ -96,7 +106,12 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
     }
 
     dispatch(
-      promotingPieceActions.setPiece({ idx: null, row: null, idxFrom: null })
+      promotingPieceActions.setPiece({
+        idxTo: null,
+        rowTo: null,
+        idxFrom: null,
+        rowFrom: null,
+      })
     );
 
     dispatchTurn();
@@ -215,13 +230,17 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
     }
 
     if (color == turn && selectedPiece) {
-      selectedPiece.pop();
-      selectedPiece.push({ coords: event.target.id, piece: piece.slice(1, 3) });
+      let updateState = JSON.parse(JSON.stringify(selectedPiece));
+      updateState.pop();
+      updateState.push({ coords: event.target.id, piece: piece.slice(1, 3) });
+      setSelectedPiece(updateState);
       return;
     }
 
     if (selectedPiece.length == 0 && piece !== "" && turn == color) {
-      selectedPiece.push({ coords: event.target.id, piece: piece.slice(1, 3) });
+      let updateState = JSON.parse(JSON.stringify(selectedPiece));
+      updateState.push({ coords: event.target.id, piece: piece.slice(1, 3) });
+      setSelectedPiece(updateState);
       return;
     }
 
@@ -311,6 +330,11 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       moveLog[selectedPiece[0].piece].castling = {
         castling: false,
         side: null,
+        piece: null,
+      };
+      moveLog[selectedPiece[0].piece].promoting = {
+        promoting: false,
+        piece: null,
       };
 
       move.push(selectedPiece[0].piece);
@@ -325,6 +349,8 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
           move.push(boardNumber[rowTo] + "++");
         } else if (castle.isCastling) {
           moveLog[selectedPiece[0].piece].castling.castling = true;
+          moveLog[selectedPiece[0].piece].castling.piece =
+            turn == "white" ? "wh" : "bh";
 
           if (castle.side == "queenSide") {
             move.push("0-0-0");
@@ -362,13 +388,28 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       dispatchMove("push", move);
     }
 
-    setBoard([...newBoard]);
-
     if (enPassant && !turn.includes(selectedPiece[0].piece[0])) {
       setEnPassant(false);
     }
 
-    resetPiece();
+    if (promoting) {
+      dispatch(
+        promotingPieceActions.setPiece({
+          rowTo: +rowTo,
+          idxTo: +idxTo,
+          idxFrom: +idxFrom,
+          rowFrom: +rowFrom,
+          pieceTaken: board[rowTo][idxTo],
+        })
+      );
+    }
+
+    setBoard([...newBoard]);
+
+    if (promoting) {
+      promoting = false;
+      return;
+    }
 
     if (checkMate) {
       piecesAttacking = [];
@@ -388,17 +429,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       return;
     }
 
-    if (promoting) {
-      promoting = false;
-      dispatch(
-        promotingPieceActions.setPiece({
-          row: +rowTo,
-          idx: +idxTo,
-          idxFrom: idxFrom,
-        })
-      );
-      return;
-    }
+    resetPiece();
 
     if (turn == "white") {
       dispatch(timerActions.setRunningTimer("black"));

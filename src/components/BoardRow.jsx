@@ -20,7 +20,7 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
   let promotingState = useSelector((state) => state.promotingPiece);
   let showTooltip = false;
 
-  if (row == 0 && promotingState.idx !== null) {
+  if (row == 0 && promotingState.idxTo !== null) {
     tooltip = (
       <div className={classes.tooltip}>
         <button
@@ -42,7 +42,7 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
       </div>
     );
   }
-  if (row == 7 && promotingState.idx !== null) {
+  if (row == 7 && promotingState.idxTo !== null) {
     tooltip = (
       <div className={classes.tooltip}>
         <button
@@ -70,7 +70,7 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
       {cases.map((_, index) => {
         isDark = !isDark;
         showTooltip =
-          +promotingState.idx === index && +promotingState.row === row;
+          promotingState.idxTo === index && promotingState.rowTo === row;
         return (
           <div
             key={`${row}.${+index}`}
