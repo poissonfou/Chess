@@ -13,27 +13,17 @@ let blackKey;
 let showPopup;
 let hasEnded;
 let moves;
-
-// const arrBoard = [
-//   ["bh", "bn", "bb", "bq", "bk", "bb", "bn", "bh"],
-//   ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-//   [0, 0, 0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0, 0, 0],
-//   ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-//   ["wh", "wn", "wb", "wq", "wk", "wb", "wn", "wh"],
-// ];
+let turn;
 
 const arrBoard = [
-  [0, 0, 0, "bq", "bk", 0, 0, 0],
+  ["bh", "bn", "bb", "bq", "bk", "bb", "bn", "bh"],
+  ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, "wk", 0, 0, 0],
+  ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
+  ["wh", "wn", "wb", "wq", "wk", "wb", "wn", "wh"],
 ];
 
 let piecesTaken = { white: [], black: [] };
@@ -46,7 +36,7 @@ function App() {
   showPopup = useSelector((state) => state.hasEnded.showPopup);
   hasEnded = useSelector((state) => state.hasEnded.hasEnded);
   moves = useSelector((state) => state.moves.moves);
-  let turn = useSelector((state) => state.turn.turn);
+  turn = useSelector((state) => state.turn.turn);
 
   if (hasEnded && turn !== "") {
     fullLogMoves = [];

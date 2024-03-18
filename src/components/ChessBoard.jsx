@@ -431,7 +431,9 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
         turn == "white" ? "1-0" : "0-1",
         moves,
         0,
-        { minutesMiliseconds, secondsInput, increment }
+        minutesMiliseconds,
+        secondsInput,
+        increment
       );
       return;
     }
@@ -908,11 +910,16 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
           dispatch(hasEndedActions.setShowPopup());
           dispatch(timerActions.setRunningTimer(null));
 
-          saveGame(dispatch, fullLogMoves, "1/2", moves, 0, {
+          saveGame(
+            dispatch,
+            fullLogMoves,
+            "1/2",
+            moves,
+            0,
             minutesMiliseconds,
             secondsInput,
-            increment,
-          });
+            increment
+          );
           return;
         }
       }

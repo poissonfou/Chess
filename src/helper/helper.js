@@ -953,9 +953,10 @@ export function saveGame(
   ...timeSections
 ) {
   let time;
+  let [timeSectionsObj] = timeSections;
+  let { minutesMiliseconds, secondsInput, increment } = timeSectionsObj;
   if (fullTime == 0) {
-    let miliseconds =
-      timeSections.minutesMiliseconds + timeSections.secondsInput;
+    let miliseconds = minutesMiliseconds + secondsInput;
 
     let seconds = miliseconds / 1000;
     let minutes = seconds / 60;
@@ -967,12 +968,12 @@ export function saveGame(
     seconds = dateTime.getSeconds();
     minutes = dateTime.getMinutes();
 
-    if (timeSections.increment == 0) {
+    if (increment == 0) {
       time = `${minutes}:${seconds}`;
     } else if (increment && seconds == 0) {
-      time = `${minutes}|${timeSections.increment}`;
+      time = `${minutes}|${increment}`;
     } else {
-      time = `${minutes}:${seconds}|${timeSections.increment}`;
+      time = `${minutes}:${seconds}|${increment}`;
     }
   } else {
     time = fullTime;
