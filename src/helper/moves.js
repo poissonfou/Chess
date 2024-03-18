@@ -42,6 +42,7 @@ export function movePawn(
     if (final.idx < initial.idx && final.idx + 1 !== initial.idx) return false;
 
     if (final.idx > initial.idx || final.idx < initial.idx) {
+      if (final.row - 1 !== initial.row) return false;
       if (enPassant) {
         if (board[initial.row][final.idx] == "bp") {
           piecesTaken.black.push(board[initial.row][final.idx]);
@@ -86,6 +87,7 @@ export function movePawn(
     if (final.idx < initial.idx && final.idx + 1 !== initial.idx) return false;
 
     if (final.idx < initial.idx || final.idx > initial.idx) {
+      if (final.row - 1 !== initial.row) return false;
       if (enPassant) {
         if (board[initial.row][final.idx] == "wp") {
           piecesTaken.white.push(board[initial.row][final.idx]);

@@ -62,6 +62,21 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
 
     newBoard[promotingPiece.rowTo][promotingPiece.idxTo] = piece;
 
+    piecesAttacking = isChecking(
+      newBoard,
+      kingsPosition[opositeColor],
+      pieceIdentifier
+    );
+
+    if (piecesAttacking.length) {
+      checkMate = isCheckMate(
+        newBoard,
+        kingsPosition[opositeColor],
+        pieceIdentifier,
+        piecesAttacking
+      );
+    }
+
     let move = [];
     move.push(piece);
 
@@ -91,12 +106,33 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
         "x" +
         boardLetters[promotingPiece.idxTo] +
         boardNumber[promotingPiece.rowTo];
+
+      if (piecesAttacking.length) {
+        checkMate ? (pieceTaken_ += "++") : (pieceTaken_ += "+");
+      }
+
       move.push(pieceTaken_ + "=" + piece[1].toUpperCase());
     } else {
       move.push(boardLetters[promotingPiece.idxTo]);
-      move.push(
-        boardNumber[promotingPiece.rowTo] + "=" + piece[1].toUpperCase()
-      );
+      if (piecesAttacking.length) {
+        checkMate
+          ? move.push(
+              boardNumber[promotingPiece.rowTo] +
+                "=" +
+                piece[1].toUpperCase() +
+                "++"
+            )
+          : move.push(
+              boardNumber[promotingPiece.rowTo] +
+                "=" +
+                piece[1].toUpperCase() +
+                "+"
+            );
+      } else {
+        move.push(
+          boardNumber[promotingPiece.rowTo] + "=" + piece[1].toUpperCase()
+        );
+      }
     }
 
     fullLogMoves.push(moveLog);
@@ -346,38 +382,52 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       move.push(selectedPiece[0].piece);
 
       if (board[rowTo][idxTo] == 0) {
-        if (piecesAttacking.length && !checkMate) {
-          move.push(boardLetters[idxTo]);
-          move.push(boardNumber[rowTo] + "+");
-        }
-        if (piecesAttacking.length && checkMate) {
-          move.push(boardLetters[idxTo]);
-          move.push(boardNumber[rowTo] + "++");
-        } else if (castle.isCastling) {
+        if (castle.isCastling) {
           moveLog[selectedPiece[0].piece].castling.castling = true;
           moveLog[selectedPiece[0].piece].castling.piece =
             turn == "white" ? "wh" : "bh";
 
           if (castle.side == "queenSide") {
             move.push("0-0-0");
-            move.push("");
+            if (piecesAttacking.length) {
+              checkMate ? move.push("++") : move.push("++");
+            } else {
+              move.push("");
+            }
             moveLog[selectedPiece[0].piece].castling.side = "queenSide";
           } else {
             move.push("0-0");
-            move.push("");
+            if (piecesAttacking.length) {
+              checkMate ? move.push("++") : move.push("++");
+            } else {
+              move.push("");
+            }
+
             moveLog[selectedPiece[0].piece].castling.side = "kingSide";
           }
           updateCastle(false, null);
         } else {
           if (enPassant) {
             moveLog[selectedPiece[0].piece].enPassant = true;
+            moveLog[selectedPiece[0].piece].pieceTaken = board[rowFrom][idxTo];
 
             pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowFrom];
             move.push(boardLetters[idxFrom]);
+
+            if (piecesAttacking.length) {
+              checkMate ? (pieceTaken += "++") : (pieceTaken += "+");
+            }
+
             move.push(pieceTaken);
           } else {
             move.push(boardLetters[idxTo]);
-            move.push(boardNumber[rowTo]);
+            if (piecesAttacking.length) {
+              checkMate
+                ? move.push(boardNumber[rowTo] + "++")
+                : move.push(boardNumber[rowTo] + "+");
+            } else {
+              move.push(boardNumber[rowTo]);
+            }
           }
         }
       } else {
@@ -386,6 +436,10 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
         moveLog[selectedPiece[0].piece].pieceTaken = board[rowTo][idxTo];
 
         pieceTaken = "x" + boardLetters[idxTo] + boardNumber[rowTo];
+
+        if (piecesAttacking.length) {
+          checkMate ? (pieceTaken += "++") : (pieceTaken += "+");
+        }
 
         move.push(pieceTaken);
       }
