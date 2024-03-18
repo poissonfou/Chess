@@ -305,6 +305,72 @@ function canHorizontalBeCovered(
   return false;
 }
 
+export function canKingMove(
+  kingsPosition,
+  kingRow,
+  finalKingRow,
+  kingIdx,
+  finalKingIdx,
+  board,
+  identifier
+) {
+  let newKingsPosition = {};
+  let piecesAttacking;
+  let newBoard = JSON.parse(JSON.stringify(board));
+
+  if (kingsPosition.row == 0) {
+    for (let j = kingRow; j > finalKingRow; j--) {
+      for (let i = kingIdx; i < finalKingIdx; i++) {
+        if (j < 0 || i < 0) continue;
+        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+        if (board[j][i] == 0 || board[j][i][0] == identifier) {
+          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
+          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
+
+          newKingsPosition.row = j;
+          newKingsPosition.idx = i;
+
+          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
+
+          newBoard = JSON.parse(JSON.stringify(board));
+
+          if (piecesAttacking.length) {
+            continue;
+          }
+
+          return true;
+        }
+      }
+    }
+    return false;
+  } else {
+    for (let j = kingRow; j <= finalKingRow; j++) {
+      for (let i = kingIdx; i <= finalKingIdx; i++) {
+        if (j > 7 || i > 7) continue;
+        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+        if (board[j][i] == 0 || board[j][i][0] == identifier) {
+          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
+          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
+
+          newKingsPosition.row = j;
+          newKingsPosition.idx = i;
+
+          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
+
+          newBoard = JSON.parse(JSON.stringify(board));
+
+          if (piecesAttacking.length) {
+            continue;
+          }
+
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}
+
 export function isChecking(
   board,
   kingsPosition,
@@ -323,6 +389,7 @@ export function isChecking(
   let identifierQueen = identifier + "q";
   let identifierBishop = identifier + "b";
   let identifierKnight = identifier + "n";
+  let identifierKing = identifier + "k";
 
   //checking pawns
   piece = board[kingsPosition.row][kingsPosition.idx];
@@ -354,6 +421,44 @@ export function isChecking(
           row = kingsPosition.row + 1;
           idx = kingsPosition.idx - 1;
           piecesAttacking.push({ row, idx });
+        }
+      }
+    }
+
+    //checking for king
+    if (piece.includes("k")) {
+      let kingRow, finalKingRow;
+
+      let kingIdx = kingsPosition.idx - 1;
+      let finalKingIdx = kingIdx + 2;
+
+      if (kingsPosition.row == 0) {
+        kingRow = kingsPosition.row + 1;
+        finalKingRow = kingRow - 2;
+      } else {
+        kingRow = kingsPosition.row - 1;
+        finalKingRow = kingRow + 2;
+      }
+
+      if (kingsPosition.row == 0) {
+        for (let j = kingRow; j > finalKingRow; j--) {
+          for (let i = kingIdx; i < finalKingIdx; i++) {
+            if (j < 0 || i < 0 || j > 7 || i > 7) continue;
+            if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+
+            if (board[j][i] == identifierKing)
+              piecesAttacking.push({ row: j, idx: i });
+          }
+        }
+      } else {
+        for (let j = kingRow; j <= finalKingRow; j++) {
+          for (let i = kingIdx; i <= finalKingIdx; i++) {
+            if (j < 0 || i < 0 || j > 7 || i > 7) continue;
+            if (j == kingsPosition.row && i == kingsPosition.idx) continue;
+
+            if (board[j][i] == identifierKing)
+              piecesAttacking.push({ row: j, idx: i });
+          }
         }
       }
     }
@@ -467,75 +572,35 @@ export function isChecking(
 }
 
 export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
-  let piecesAttacking;
-  let newKingsPosition = {};
-  let newBoard = JSON.parse(JSON.stringify(board));
   let canBeTaken;
   let opositeIdentifier;
 
   let kingRow;
   let finalKingRow;
-
   let kingIdx = kingsPosition.idx - 1;
   let finalKingIdx = kingIdx + 2;
 
   //checking if king can move
-
   if (kingsPosition.row == 0) {
     kingRow = kingsPosition.row + 1;
     finalKingRow = kingRow - 2;
-
-    for (let j = kingRow; j > finalKingRow; j--) {
-      for (let i = kingIdx; i < finalKingIdx; i++) {
-        if (j < 0 || i < 0) continue;
-        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
-        if (board[j][i] == 0 || board[j][i][0] == identifier) {
-          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
-          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
-
-          newKingsPosition.row = j;
-          newKingsPosition.idx = i;
-
-          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
-
-          newBoard = JSON.parse(JSON.stringify(board));
-
-          if (piecesAttacking.length) {
-            continue;
-          }
-
-          return false;
-        }
-      }
-    }
   } else {
     kingRow = kingsPosition.row - 1;
     finalKingRow = kingRow + 2;
-
-    for (let j = kingRow; j <= finalKingRow; j++) {
-      for (let i = kingIdx; i <= finalKingIdx; i++) {
-        if (j > 7 || i > 7) continue;
-        if (j == kingsPosition.row && i == kingsPosition.idx) continue;
-        if (board[j][i] == 0 || board[j][i][0] == identifier) {
-          newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
-          newBoard[kingsPosition.row][kingsPosition.idx] = 0;
-
-          newKingsPosition.row = j;
-          newKingsPosition.idx = i;
-
-          piecesAttacking = isChecking(newBoard, newKingsPosition, identifier);
-
-          newBoard = JSON.parse(JSON.stringify(board));
-
-          if (piecesAttacking.length) {
-            continue;
-          }
-
-          return false;
-        }
-      }
-    }
   }
+
+  if (
+    canKingMove(
+      kingsPosition,
+      kingRow,
+      finalKingRow,
+      kingIdx,
+      finalKingIdx,
+      board,
+      identifier
+    )
+  )
+    return false;
 
   if (piecesChecking.length >= 2) return true;
 

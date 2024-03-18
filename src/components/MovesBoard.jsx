@@ -145,8 +145,6 @@ function MovesBoard({
         key = Object.keys(move)[0];
       }
 
-      console.log(move, key, moveBackward.move);
-
       newBoard[move[key].rowFrom][move[key].idxFrom] = key;
 
       if (move[key].enPassant) {
@@ -165,10 +163,8 @@ function MovesBoard({
           newBoard[move[key].rowTo][move[key].idxTo - 1] = 0;
         }
       } else if (move[key].promoting.promoting) {
-        console.log("we are heree", move[key].pieceTaken);
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
         newBoard[move[key].rowFrom][move[key].idxFrom] = key;
-        console.log(newBoard, newBoard[move[key].rowTo][move[key].idxTo]);
       } else {
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
       }
