@@ -517,7 +517,7 @@ function MovesBoard({
             <h1>Moves</h1>
             <div
               className={
-                moves.length > 10
+                moves.length > 14
                   ? `${classes["entrys"]} ${classes.overflow}`
                   : `${classes["entrys"]}`
               }

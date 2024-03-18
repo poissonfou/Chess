@@ -692,8 +692,6 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
 
                 if (!possibleMoves.length) continue;
 
-                console.log(possibleMoves);
-
                 for (let i = 0; i < possibleMoves.length; i++) {
                   let previewBoard = JSON.parse(JSON.stringify(board));
                   previewBoard[possibleMoves[i].rowFrom][

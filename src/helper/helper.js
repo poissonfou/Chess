@@ -953,8 +953,12 @@ export function saveGame(
   ...timeSections
 ) {
   let time;
-  let [timeSectionsObj] = timeSections;
-  let { minutesMiliseconds, secondsInput, increment } = timeSectionsObj;
+
+  let minutesMiliseconds, secondsInput, increment;
+  if (timeSections.length) {
+    [{ minutesMiliseconds, secondsInput, increment }] = timeSections;
+  }
+
   if (fullTime == 0) {
     let miliseconds = minutesMiliseconds + secondsInput;
 

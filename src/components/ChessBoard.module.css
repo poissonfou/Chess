@@ -4,15 +4,16 @@
 
 .board-nums {
   position: absolute;
-  margin-left: 0.1em;
+  margin-left: 0.2em;
   margin-top: 0;
   padding: 0;
 }
 
 .board-nums li {
   list-style: none;
-  font-size: 1.5rem;
-  margin-top: 2rem;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2.2em;
 }
 
 .board-letters {
@@ -25,28 +26,47 @@
 
 .board-letters li {
   list-style: none;
-  font-size: 1.5rem;
-  margin-left: 1.5em;
-  width: 50%;
-  margin-right: 0.7em;
+  font-size: 1.2rem;
+  margin-left: 2.4em;
+  margin-right: 0.35em;
+  padding-right: 0.1em;
+  margin-top: 0.5em;
 }
 
 @media (max-width: 675px) {
   .board-letters {
-    margin-top: -1.1em;
+    margin-top: -1.7em;
   }
 
   .board-letters li {
     font-size: 1rem;
-    margin-left: 1.8em;
+    margin-left: 3em;
+    margin-right: 0.2em;
+    padding-right: 0.1em;
+    margin-top: 0.5em;
   }
 
   .board-nums {
-    margin-left: 0.1em;
+    margin-left: 0.2em;
   }
 
   .board-nums li {
     font-size: 1rem;
-    margin-top: 1.7rem;
+    margin-bottom: 2.7em;
+  }
+}
+
+@media (max-width: 600px) {
+  .board-letters li {
+    font-size: 1rem;
+    margin-left: 2.7em;
+    margin-right: 0.2em;
+    padding-right: 0.1em;
+    margin-top: 0.5em;
+  }
+
+  .board-nums li {
+    font-size: 1rem;
+    margin-bottom: 2.4em;
   }
 }
