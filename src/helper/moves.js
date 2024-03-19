@@ -127,6 +127,9 @@ export function moveKing(
     return true;
   }
   if (initial.row == final.row) {
+    if (final.idx - 1 == initial.idx || final.idx + 1 == initial.idx)
+      return true;
+
     if (initial.row == 7 || initial.row == 0) {
       if (!kingsPosition.hasMoved) {
         if (final.idx + 2 == initial.idx) {
@@ -162,7 +165,6 @@ export function moveKing(
     return false;
 
   if (board[final.row][final.idx] !== 0) {
-    //check if taking is valid
     setPiecesTaken(turn, final, board, piecesTaken);
   }
   updateKingsPosition(turn, final, true);
