@@ -884,7 +884,12 @@ function ChessBoard({
                   while (counter < 3) {
                     if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
                       if (board[rowRef][idxRef][0] == opositePiece)
-                        possibleMoves.push(board[rowRef][idxRef]);
+                        possibleMoves.push({
+                          rowTo: rowRef,
+                          idxTo: idxRef,
+                          rowFrom: row,
+                          idxFrom: idx,
+                        });
                     }
 
                     idxRef = idx + 1;
