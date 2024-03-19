@@ -49,12 +49,18 @@ let boardLetters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 let promoting = false;
 
-function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
+function ChessBoard({
+  board,
+  setBoard,
+  piecesTaken,
+  fullLogMoves,
+  highlightCase,
+  setHighlightCase,
+}) {
   let moves = useSelector((state) => state.moves.moves);
   let { minutesMiliseconds, secondsInput, increment } = useGameInfo();
   const dispatch = useDispatch();
   const [selectedPiece, setSelectedPiece] = useState([]);
-  const [highlightCase, setHighlightCase] = useState({ from: null, to: null });
 
   let turn = useSelector((state) => state.turn.turn);
 
@@ -292,8 +298,6 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       setHighlightCase({ from: event.target.id, to: null });
       return;
     }
-
-    console.log(selectedPiece[0].coords, event.target.id);
 
     if (!authMove(event, selectedPiece)) {
       resetPiece();

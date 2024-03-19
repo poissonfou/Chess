@@ -17,10 +17,11 @@ let currentMove;
 
 function MovesBoard({
   initialBoard,
-  boardObj,
+  board,
   setBoard,
   piecesTaken,
   fullLogMoves,
+  setHighlightCase,
 }) {
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
@@ -40,8 +41,6 @@ function MovesBoard({
 
   let dispatch = useDispatch();
   let counter = 1;
-
-  let board = boardObj.board;
 
   useEffect(() => {
     currentMove = undefined;
@@ -93,9 +92,21 @@ function MovesBoard({
       idx: moves.length - 1,
     };
 
+    const move = fullLogMoves[moveBackward.idx];
+    let key = moveBackward.move[0][0];
+
+    if (Object.keys(move)[0] !== key) {
+      key = Object.keys(move)[0];
+    }
+
     setBoard((prevBoard) => {
       return { board: prevBoard.finalBoard, finalBoard: prevBoard.finalBoard };
     });
+    setHighlightCase({
+      from: `${move[key].rowFrom}.${move[key].idxFrom}`,
+      to: `${move[key].rowTo}.${move[key].idxTo}`,
+    });
+
     gameReplay = false;
     currentMove = moves.length - 1;
   }
@@ -116,6 +127,7 @@ function MovesBoard({
     setBoard((prevBoard) => {
       return { board: initialBoard, finalBoard: prevBoard.finalBoard };
     });
+    setHighlightCase({ from: null, to: null });
     gameReplay = true;
     currentMove = -1;
   }
@@ -176,6 +188,11 @@ function MovesBoard({
 
       setBoard((prevBoard) => {
         return { board: [...newBoard], finalBoard: prevBoard.finalBoard };
+      });
+
+      setHighlightCase({
+        from: `${move[key].rowFrom}.${move[key].idxFrom}`,
+        to: `${move[key].rowTo}.${move[key].idxTo}`,
       });
 
       if (moveBackward.idx == 0) {
@@ -257,6 +274,11 @@ function MovesBoard({
 
       setBoard((prevBoard) => {
         return { board: [...newBoard], finalBoard: prevBoard.finalBoard };
+      });
+
+      setHighlightCase({
+        from: `${move[key].rowFrom}.${move[key].idxFrom}`,
+        to: `${move[key].rowTo}.${move[key].idxTo}`,
       });
       gameReplay = false;
     }
@@ -359,6 +381,7 @@ function MovesBoard({
       dispatch(hasEndedActions.setShowPopup());
     }
     dispatch(turnActions.changeTurn(null));
+    setHighlightCase({ from: null, to: null });
   }
 
   function drawGame() {

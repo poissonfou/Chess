@@ -10,8 +10,7 @@ import PiecesTaken from "./components/PiecesTaken";
 
 let whiteKey;
 let blackKey;
-let showPopup;
-let hasEnded;
+
 let moves;
 let turn;
 
@@ -31,10 +30,10 @@ let fullLogMoves = [];
 
 function App() {
   const [board, setBoard] = useState({ board: arrBoard, finalBoard: [] });
+  const [highlightCase, setHighlightCase] = useState({ from: null, to: null });
   whiteKey = useSelector((state) => state.timer.forceRenderWhite);
   blackKey = useSelector((state) => state.timer.forceRenderBlack);
-  showPopup = useSelector((state) => state.hasEnded.showPopup);
-  hasEnded = useSelector((state) => state.hasEnded.hasEnded);
+  let { showPopup, hasEnded } = useSelector((state) => state.hasEnded);
   moves = useSelector((state) => state.moves.moves);
   turn = useSelector((state) => state.turn.turn);
 
@@ -54,6 +53,7 @@ function App() {
             board={arrBoard}
             setBoard={setBoard}
             piecesTaken={piecesTaken}
+            setHighlightCase={setHighlightCase}
           />
         )}
         <ChessBoard
@@ -61,6 +61,8 @@ function App() {
           setBoard={setBoard}
           piecesTaken={piecesTaken}
           fullLogMoves={fullLogMoves}
+          highlightCase={highlightCase}
+          setHighlightCase={setHighlightCase}
         />
         <div className="player-info">
           <Timer key={whiteKey} color={"white"} fullLogMoves={fullLogMoves} />
@@ -69,10 +71,11 @@ function App() {
       </div>
       <MovesBoard
         initialBoard={arrBoard}
-        boardObj={board}
+        board={board.board}
         setBoard={setBoard}
         piecesTaken={piecesTaken}
         fullLogMoves={fullLogMoves}
+        setHighlightCase={setHighlightCase}
       />
     </div>
   );

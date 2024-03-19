@@ -9,7 +9,12 @@ import {
 } from "../store";
 import { useSelector, useDispatch } from "react-redux";
 
-export default function Popup({ board, setBoard, piecesTaken }) {
+export default function Popup({
+  board,
+  setBoard,
+  piecesTaken,
+  setHighlightCase,
+}) {
   const dispatch = useDispatch();
   const turn = useSelector((state) => state.turn.turn);
   let minutesMiliseconds = useSelector((state) => state.timer.time.minutes);
@@ -51,6 +56,7 @@ export default function Popup({ board, setBoard, piecesTaken }) {
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
     dispatch(turnActions.changeTurn("white"));
+    setHighlightCase({ from: null, to: null });
   }
 
   function closePopup() {
