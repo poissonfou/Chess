@@ -317,7 +317,7 @@ function ChessBoard({
     }
 
     let newBoard = JSON.parse(JSON.stringify(board));
-    if (enPassant) {
+    if (enPassant && idxTo !== idxFrom) {
       newBoard[rowTo][idxTo] = selectedPiece[0].piece;
       newBoard[rowFrom][idxTo] = 0;
       newBoard[rowFrom][idxFrom] = 0;
@@ -420,7 +420,7 @@ function ChessBoard({
           }
           updateCastle(false, null);
         } else {
-          if (enPassant) {
+          if (enPassant && idxFrom !== idxTo) {
             moveLog[selectedPiece[0].piece].enPassant = true;
             moveLog[selectedPiece[0].piece].pieceTaken = board[rowFrom][idxTo];
 

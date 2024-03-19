@@ -127,8 +127,10 @@ export function moveKing(
     return true;
   }
   if (initial.row == final.row) {
-    if (final.idx - 1 == initial.idx || final.idx + 1 == initial.idx)
+    if (final.idx - 1 == initial.idx || final.idx + 1 == initial.idx) {
+      updateKingsPosition(turn, final, true);
       return true;
+    }
 
     if (initial.row == 7 || initial.row == 0) {
       if (!kingsPosition.hasMoved) {

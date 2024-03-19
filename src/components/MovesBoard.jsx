@@ -241,8 +241,9 @@ function MovesBoard({
       newBoard[move[key].rowTo][move[key].idxTo] = key;
 
       if (move[key].enPassant) {
+        console.log("we shoul not be here");
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
-        newBoard[move[key].rowFrom][move[key].idxTo] = move[key].pieceTaken;
+        newBoard[move[key].rowFrom][move[key].idxTo] = 0;
       } else if (move[key].castling.castling) {
         newBoard[move[key].rowTo][move[key].idxTo] = key;
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
@@ -259,7 +260,7 @@ function MovesBoard({
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].promoting.piece;
         newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
       } else {
-        newBoard[move[key].rowFrom][move[key].idxFrom] = move[key].pieceTaken;
+        newBoard[move[key].rowFrom][move[key].idxFrom] = 0;
       }
 
       moveBackward = {
@@ -572,11 +573,11 @@ function MovesBoard({
                           }
 
                           if (index == 0) {
-                            number = <span>{index + 1 + " - "}</span>;
+                            number = <span>{index + 1 + " -"}</span>;
                           } else if (index == 2) {
-                            number = <span>{index + " - "}</span>;
+                            number = <span>{index + " -"}</span>;
                           } else {
-                            number = <span>{index - counter + " - "}</span>;
+                            number = <span>{index - counter + " -"}</span>;
                             counter++;
                           }
 
