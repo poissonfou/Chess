@@ -54,6 +54,8 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
   let { minutesMiliseconds, secondsInput, increment } = useGameInfo();
   const dispatch = useDispatch();
   const [selectedPiece, setSelectedPiece] = useState([]);
+  const [highlightCase, setHighlightCase] = useState({ from: null, to: null });
+
   let turn = useSelector((state) => state.turn.turn);
 
   let promotingPiece = useSelector((state) => state.promotingPiece);
@@ -279,6 +281,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       updateState.pop();
       updateState.push({ coords: event.target.id, piece: piece.slice(1, 3) });
       setSelectedPiece(updateState);
+      setHighlightCase({ from: event.target.id, to: null });
       return;
     }
 
@@ -286,8 +289,11 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       let updateState = JSON.parse(JSON.stringify(selectedPiece));
       updateState.push({ coords: event.target.id, piece: piece.slice(1, 3) });
       setSelectedPiece(updateState);
+      setHighlightCase({ from: event.target.id, to: null });
       return;
     }
+
+    console.log(selectedPiece[0].coords, event.target.id);
 
     if (!authMove(event, selectedPiece)) {
       resetPiece();
@@ -475,6 +481,10 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       promoting = false;
       return;
     }
+
+    setHighlightCase((prevState) => {
+      return { from: prevState.from, to: event.target.id };
+    });
 
     if (checkMate) {
       piecesAttacking = [];
@@ -1014,6 +1024,7 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
             row={+idx}
             promotePiece={promotePiece}
             onClick={handleMove}
+            highlightCase={highlightCase}
           />
         ))}
       </div>

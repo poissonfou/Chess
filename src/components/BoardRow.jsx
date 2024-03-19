@@ -12,7 +12,14 @@ const cases = [
   <div></div>,
 ];
 
-function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
+function BoardRow({
+  dark,
+  rowData,
+  row,
+  promotePiece,
+  onClick,
+  highlightCase,
+}) {
   let isDark = dark;
   let piece;
   let color;
@@ -77,6 +84,14 @@ function BoardRow({ dark, rowData, row, promotePiece, onClick }) {
             id={`${row}.${+index}`}
             className={`${isDark ? classes.dark : classes.light} ${
               rowData[index] !== 0 ? classes[rowData[index]] : ""
+            } ${
+              highlightCase.from == `${row}.${+index}`
+                ? classes["highlight-case"]
+                : ""
+            } ${
+              highlightCase.to == `${row}.${+index}`
+                ? classes["highlight-case"]
+                : ""
             }`}
             onClick={(event) => {
               piece = rowData[index] !== 0 ? classes[rowData[index]] : "";

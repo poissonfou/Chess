@@ -54,6 +54,10 @@
   background-color: rgb(248, 238, 238);
 }
 
+.highlight-case {
+  background-color: rgb(118, 185, 121);
+}
+
 .bp {
   background-image: url("../assets/blackPawn.png");
 }
