@@ -13,6 +13,7 @@ import { useState, useRef, useEffect } from "react";
 
 let moveBackward, moveFoward;
 let gameReplay = false;
+let currentMove;
 
 function MovesBoard({
   initialBoard,
@@ -39,7 +40,7 @@ function MovesBoard({
 
   let dispatch = useDispatch();
   let counter = 1;
-  let currentMove = boardObj.finalBoard;
+
   let board = boardObj.board;
 
   useEffect(() => {
@@ -96,6 +97,7 @@ function MovesBoard({
       return { board: prevBoard.finalBoard, finalBoard: prevBoard.finalBoard };
     });
     gameReplay = false;
+    currentMove = moves.length - 1;
   }
 
   function resetBoard() {
@@ -115,6 +117,7 @@ function MovesBoard({
       return { board: initialBoard, finalBoard: prevBoard.finalBoard };
     });
     gameReplay = true;
+    currentMove = -1;
   }
 
   function retractMoves(direction) {
