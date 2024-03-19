@@ -50,7 +50,8 @@ let boardNumber = [8, 7, 6, 5, 4, 3, 2, 1];
 let promoting = false;
 
 function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
-  let { moves, minutesMiliseconds, secondsInput, increment } = useGameInfo();
+  let moves = useSelector((state) => state.moves.moves);
+  let { minutesMiliseconds, secondsInput, increment } = useGameInfo();
   const dispatch = useDispatch();
   const [selectedPiece, setSelectedPiece] = useState([]);
   let turn = useSelector((state) => state.turn.turn);
@@ -137,7 +138,9 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
 
     fullLogMoves.push(moveLog);
 
-    setBoard([...newBoard]);
+    setBoard(() => {
+      return { board: [...newBoard], finalBoard: [...newBoard] };
+    });
 
     dispatchMove("push", move);
 
@@ -464,7 +467,9 @@ function ChessBoard({ board, setBoard, piecesTaken, fullLogMoves }) {
       );
     }
 
-    setBoard(() => [...newBoard]);
+    setBoard(() => {
+      return { board: [...newBoard], finalBoard: [...newBoard] };
+    });
 
     if (promoting) {
       promoting = false;

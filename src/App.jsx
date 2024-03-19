@@ -30,7 +30,7 @@ let piecesTaken = { white: [], black: [] };
 let fullLogMoves = [];
 
 function App() {
-  const [board, setBoard] = useState(arrBoard);
+  const [board, setBoard] = useState({ board: arrBoard, finalBoard: [] });
   whiteKey = useSelector((state) => state.timer.forceRenderWhite);
   blackKey = useSelector((state) => state.timer.forceRenderBlack);
   showPopup = useSelector((state) => state.hasEnded.showPopup);
@@ -57,7 +57,7 @@ function App() {
           />
         )}
         <ChessBoard
-          board={board}
+          board={board.board}
           setBoard={setBoard}
           piecesTaken={piecesTaken}
           fullLogMoves={fullLogMoves}
@@ -69,7 +69,7 @@ function App() {
       </div>
       <MovesBoard
         initialBoard={arrBoard}
-        board={board}
+        boardObj={board}
         setBoard={setBoard}
         piecesTaken={piecesTaken}
         fullLogMoves={fullLogMoves}

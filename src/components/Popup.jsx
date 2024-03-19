@@ -35,7 +35,9 @@ export default function Popup({ board, setBoard, piecesTaken }) {
 
   function restartGame() {
     dispatch(movesActions.empty());
-    setBoard([...board]);
+    setBoard((prevBoard) => {
+      return { board: [...board], ...prevBoard.finalBoard };
+    });
     dispatch(
       timerActions.setTime({
         minutes: minutesMiliseconds,

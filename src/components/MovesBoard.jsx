@@ -12,14 +12,11 @@ import {
 import { useState, useRef, useEffect } from "react";
 
 let moveBackward, moveFoward;
-let currentBoard;
 let gameReplay = false;
-
-let currentMove;
 
 function MovesBoard({
   initialBoard,
-  board,
+  boardObj,
   setBoard,
   piecesTaken,
   fullLogMoves,
@@ -42,6 +39,8 @@ function MovesBoard({
 
   let dispatch = useDispatch();
   let counter = 1;
+  let currentMove = boardObj.finalBoard;
+  let board = boardObj.board;
 
   useEffect(() => {
     currentMove = undefined;
@@ -88,12 +87,15 @@ function MovesBoard({
       idx: moves.length - 1,
     };
 
-    moveBackward = {
+    moveFoward = {
       move: moves[moves.length - 1],
       idx: moves.length - 1,
     };
 
-    setBoard(currentBoard);
+    setBoard((prevBoard) => {
+      return { board: prevBoard.finalBoard, finalBoard: prevBoard.finalBoard };
+    });
+    gameReplay = false;
   }
 
   function resetBoard() {
@@ -109,10 +111,10 @@ function MovesBoard({
       idx: 0,
     };
 
-    setBoard((prevState) => {
-      currentBoard = prevState;
-      return initialBoard;
+    setBoard((prevBoard) => {
+      return { board: initialBoard, finalBoard: prevBoard.finalBoard };
     });
+    gameReplay = true;
   }
 
   function retractMoves(direction) {
@@ -169,11 +171,8 @@ function MovesBoard({
         newBoard[move[key].rowTo][move[key].idxTo] = move[key].pieceTaken;
       }
 
-      setBoard((prevState) => {
-        if (moveBackward.idx == moves.length - 1) {
-          currentBoard = prevState;
-        }
-        return [...newBoard];
+      setBoard((prevBoard) => {
+        return { board: [...newBoard], finalBoard: prevBoard.finalBoard };
       });
 
       if (moveBackward.idx == 0) {
@@ -253,7 +252,9 @@ function MovesBoard({
         idx: moveFoward.idx + 1,
       };
 
-      setBoard([...newBoard]);
+      setBoard((prevBoard) => {
+        return { board: [...newBoard], finalBoard: prevBoard.finalBoard };
+      });
       gameReplay = false;
     }
   }
@@ -337,7 +338,9 @@ function MovesBoard({
 
   function showTimeOptions() {
     dispatch(movesActions.empty());
-    setBoard([...initialBoard]);
+    setBoard((prevBoard) => {
+      return { board: [...initialBoard], finalBoard: prevBoard.finalBoard };
+    });
     resetPiecesTaken(piecesTaken);
     dispatch(
       timerActions.setTime({

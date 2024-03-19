@@ -952,6 +952,7 @@ export function saveGame(
   fullTime,
   ...timeSections
 ) {
+  if (moves.length == 0) return;
   let time;
   let minutesMiliseconds, secondsInput, increment;
   if (timeSections.length) {
