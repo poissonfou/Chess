@@ -10,7 +10,6 @@ import PiecesTaken from "./components/PiecesTaken";
 
 let whiteKey;
 let blackKey;
-
 let moves;
 let turn;
 
@@ -60,6 +59,7 @@ function App() {
           board={board.board}
           setBoard={setBoard}
           piecesTaken={piecesTaken}
+          moves={moves}
           fullLogMoves={fullLogMoves}
           highlightCase={highlightCase}
           setHighlightCase={setHighlightCase}

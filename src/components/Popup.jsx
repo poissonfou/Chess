@@ -55,8 +55,8 @@ export default function Popup({
     dispatch(timerActions.changeKeys());
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
-    dispatch(turnActions.changeTurn("white"));
     setHighlightCase({ from: null, to: null });
+    dispatch(turnActions.changeTurn("white"));
   }
 
   function closePopup() {

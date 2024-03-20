@@ -981,6 +981,469 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   return true;
 }
 
+export function isDraw(
+  kingsPosition,
+  pieceIdentifier,
+  newBoard,
+  board,
+  opositeColor,
+  turn
+) {
+  let kingRow, finalKingRow;
+
+  let kingIdx = kingsPosition[opositeColor].idx - 1;
+  let finalKingIdx = kingIdx + 2;
+
+  if (kingsPosition[opositeColor].row == 0) {
+    kingRow = kingsPosition[opositeColor].row + 1;
+    finalKingRow = kingRow - 2;
+  } else {
+    kingRow = kingsPosition[opositeColor].row - 1;
+    finalKingRow = kingRow + 2;
+  }
+
+  let canMove = canKingMove(
+    kingsPosition[opositeColor],
+    kingRow,
+    finalKingRow,
+    kingIdx,
+    finalKingIdx,
+    newBoard,
+    pieceIdentifier
+  );
+
+  if (!canMove) {
+    pieceIdentifier = turn == "white" ? "b" : "w";
+    let piece;
+
+    for (let row = 0; row < board.length; row++) {
+      for (let idx = 0; idx < board[row].length; idx++) {
+        if (board[row][idx] == 0) continue;
+        if (board[row][idx][0] == pieceIdentifier) {
+          piece = board[row][idx][1];
+
+          if (piece == "h") {
+            let possibleMoves = [];
+            let counter = 1;
+            let idxRef = idx - 1;
+            let rowRef = row - 1;
+            let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+            while (counter <= 4) {
+              if (counter < 3) {
+                if (board[row][idxRef] !== undefined) {
+                  if (
+                    board[row][idxRef] == 0 ||
+                    board[row][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowTo: row,
+                      idxTo: idxRef,
+                      rowFrom: row,
+                      idxFrom: idx,
+                    });
+                }
+                idxRef = idx + 1;
+              } else {
+                if (board[rowRef] && board[rowRef][idx] !== undefined) {
+                  if (
+                    board[rowRef][idx] == 0 ||
+                    board[rowRef][idx][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowTo: rowRef,
+                      idxTo: idx,
+                      rowFrom: row,
+                      idxFrom: idx,
+                    });
+                }
+
+                rowRef = row + 1;
+              }
+              counter++;
+            }
+
+            if (!possibleMoves.length) continue;
+
+            for (let i = 0; i < possibleMoves.length; i++) {
+              let previewBoard = JSON.parse(JSON.stringify(board));
+              previewBoard[possibleMoves[i].rowFrom][
+                possibleMoves[i].idxFrom
+              ] = 0;
+              previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                board[row][idx];
+
+              let piecesAttacking = isChecking(
+                previewBoard,
+                kingsPosition[opositeColor],
+                opositePiece
+              );
+
+              if (piecesAttacking.length == 0) {
+                return false;
+              }
+            }
+          }
+
+          if (piece == "b") {
+            let possibleMoves = [];
+            let counter = 1;
+            let idxRef = idx - 1;
+            let rowRef = row + 1;
+            let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+            while (counter < 5) {
+              if (counter <= 2) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+
+                idxRef = idx + 1;
+              } else {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+
+                idxRef = idx - 1;
+              }
+
+              if (counter == 2) {
+                rowRef = row - 1;
+              }
+
+              counter++;
+            }
+
+            if (!possibleMoves.length) continue;
+
+            for (let i = 0; i < possibleMoves.length; i++) {
+              let previewBoard = JSON.parse(JSON.stringify(board));
+              previewBoard[possibleMoves[i].rowFrom][
+                possibleMoves[i].idxFrom
+              ] = 0;
+              previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                board[row][idx];
+
+              let piecesAttacking = isChecking(
+                previewBoard,
+                kingsPosition[opositeColor],
+                opositePiece
+              );
+
+              if (piecesAttacking.length == 0) {
+                return false;
+              }
+            }
+          }
+
+          if (piece == "n") {
+            let possibleMoves = [];
+            let counter = 1;
+            let idxRef = idx - 1;
+            let rowRef = row + 2;
+            let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+            while (counter < 9) {
+              if (counter <= 2) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+                idxRef = idx + 1;
+              } else if (counter <= 4) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+                idxRef = idx - 1;
+              } else if (counter <= 6) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+                idxRef = idx + 2;
+              } else {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+
+                idxRef = idx + 2;
+              }
+
+              if (counter == 2) {
+                rowRef = row - 2;
+              }
+              if (counter == 4) {
+                rowRef = row - 1;
+                idxRef = idx - 2;
+              }
+              if (counter == 6) {
+                rowRef = row + 1;
+                idxRef = idx - 2;
+              }
+
+              counter++;
+            }
+
+            if (!possibleMoves.length) continue;
+
+            for (let i = 0; i < possibleMoves.length; i++) {
+              let previewBoard = JSON.parse(JSON.stringify(board));
+              previewBoard[possibleMoves[i].rowFrom][
+                possibleMoves[i].idxFrom
+              ] = 0;
+              previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                board[row][idx];
+
+              let piecesAttacking = isChecking(
+                previewBoard,
+                kingsPosition[opositeColor],
+                opositePiece
+              );
+
+              if (piecesAttacking.length == 0) {
+                return false;
+              }
+            }
+          }
+
+          if (piece == "q") {
+            let possibleMoves = [];
+            let counter = 1;
+            let idxRef = idx - 1;
+            let rowRef = row;
+            let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+            while (counter < 9) {
+              if (counter <= 2) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+                idxRef = idx + 1;
+              } else {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (
+                    board[rowRef][idxRef] == 0 ||
+                    board[rowRef][idxRef][0] == opositePiece
+                  )
+                    possibleMoves.push({
+                      rowFrom: row,
+                      idxFrom: idx,
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                    });
+                }
+              }
+
+              if (counter == 2) {
+                rowRef = row + 1;
+                idxRef = idx;
+              }
+              if (counter == 3) {
+                idxRef = idx - 1;
+              }
+              if (counter == 4) {
+                idxRef = idx + 1;
+              }
+
+              if (counter == 5) {
+                rowRef = row - 1;
+                idxRef = idx;
+              }
+
+              if (counter == 6) {
+                idxRef = idx - 1;
+              }
+
+              if (counter == 7) {
+                idxRef = idx + 1;
+              }
+
+              counter++;
+            }
+
+            if (!possibleMoves.length) continue;
+
+            for (let i = 0; i < possibleMoves.length; i++) {
+              let previewBoard = JSON.parse(JSON.stringify(board));
+              previewBoard[possibleMoves[i].rowFrom][
+                possibleMoves[i].idxFrom
+              ] = 0;
+              previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                board[row][idx];
+
+              let piecesAttacking = isChecking(
+                previewBoard,
+                kingsPosition[opositeColor],
+                opositePiece
+              );
+
+              if (piecesAttacking.length == 0) {
+                return false;
+              }
+            }
+          }
+
+          if (piece == "p") {
+            let possibleMoves = [];
+            if (pieceIdentifier == "w") {
+              let counter = 1;
+              let rowRef = row - 1;
+              let idxRef = idx - 1;
+              let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+              while (counter < 3) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (board[rowRef][idxRef][0] == opositePiece)
+                    possibleMoves.push({
+                      rowTo: rowRef,
+                      idxTo: idxRef,
+                      rowFrom: row,
+                      idxFrom: idx,
+                    });
+                }
+
+                idxRef = idx + 1;
+                counter++;
+              }
+
+              if (!possibleMoves.length) {
+                if (board[row - 1] && board[row - 1][idx] !== 0) {
+                  continue;
+                } else {
+                  return false;
+                }
+              }
+
+              for (let i = 0; i < possibleMoves.length; i++) {
+                let previewBoard = JSON.parse(JSON.stringify(board));
+                previewBoard[possibleMoves[i].rowFrom][
+                  possibleMoves[i].idxFrom
+                ] = 0;
+                previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                  board[row][idx];
+
+                let piecesAttacking = isChecking(
+                  previewBoard,
+                  kingsPosition[opositeColor],
+                  opositePiece
+                );
+
+                if (piecesAttacking.length == 0) {
+                  return false;
+                }
+              }
+            } else {
+              let counter = 1;
+              let rowRef = row + 1;
+              let idxRef = idx - 1;
+              let opositePiece = pieceIdentifier == "w" ? "b" : "w";
+
+              while (counter < 3) {
+                if (board[rowRef] && board[rowRef][idxRef] !== undefined) {
+                  if (board[rowRef][idxRef][0] == opositePiece)
+                    possibleMoves.push(board[rowRef][idxRef]);
+                }
+
+                idxRef = idx + 1;
+                counter++;
+              }
+
+              if (!possibleMoves.length) {
+                if (board[row + 1] && board[row + 1][idx] !== 0) {
+                  continue;
+                } else {
+                  return false;
+                }
+              }
+
+              for (let i = 0; i < possibleMoves.length; i++) {
+                let previewBoard = JSON.parse(JSON.stringify(board));
+                previewBoard[possibleMoves[i].rowFrom][
+                  possibleMoves[i].idxFrom
+                ] = 0;
+                previewBoard[possibleMoves[i].rowTo][possibleMoves[i].idxTo] =
+                  board[row][idx];
+
+                let piecesAttacking = isChecking(
+                  previewBoard,
+                  kingsPosition[opositeColor],
+                  opositePiece
+                );
+
+                if (piecesAttacking.length == 0) {
+                  return false;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
+}
+
 export function saveGame(
   dispatch,
   fullLogMoves,
