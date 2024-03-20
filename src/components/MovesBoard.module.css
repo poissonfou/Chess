@@ -5,29 +5,22 @@
   width: 100%;
   height: 30rem;
   border-radius: 5px;
-}
-
-.expanded-moves-log {
-  height: 30rem;
-}
-
-.expanded-moves-log h1 {
-  margin-top: 0.2em;
+  margin-top: -0.5em;
 }
 
 .extra-margin {
   margin-left: -5.6em;
 }
 
-@media (max-width: 690px) {
+@media (max-width: 720px) {
   .moves-log {
-    width: 25em;
+    width: 30em;
   }
 }
 
-@media (max-width: 601px) {
+@media (max-width: 550px) {
   .moves-log {
-    width: 22em;
+    width: 25em;
   }
 }
 
@@ -108,7 +101,7 @@
   border-radius: 10px;
   box-shadow: 0px 4px rgb(56, 56, 56);
   background-color: rgb(17, 124, 17);
-  font-size: 2rem;
+  font-size: 1.7rem;
   color: white;
 }
 
@@ -119,12 +112,16 @@
 
   .play-button {
     padding: 0.6em;
-    font-size: 1.6rem;
+    font-size: 1.3rem;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 700px) {
   .selected-time {
+    font-size: 1.7rem;
+  }
+
+  .play-button {
     font-size: 1.7rem;
   }
 }
@@ -141,15 +138,17 @@
   margin: 0 2em;
   width: 100%;
   padding: 0;
-  margin-right: 6em;
+  padding-left: 0.5em;
+  margin-right: 5em;
   margin-left: 1em;
 }
 
 .entry-black {
   width: 100%;
   padding: 0;
+  padding-left: 0.5em;
   margin: 0 5em;
-  margin-left: -0.5em;
+  margin-left: -1em;
   margin-right: 1em;
 }
 
@@ -162,28 +161,63 @@
 }
 
 .entry-white li span {
-  width: 2em;
+  width: 1.5em;
 }
 
 .entry-white li div {
   display: flex;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   padding: 0.1em 0.1em;
   margin-bottom: 0em;
+}
+
+.entry-black li {
+  display: flex;
+  font-size: 1.5rem;
+  margin-bottom: 0.4em;
+  padding: 0.15em 0.1em;
   color: white;
+}
+
+@media (max-width: 1000px) {
+  .entry-white li span {
+    font-size: 1.1rem;
+  }
+
+  .entry-white {
+    margin-right: 2em;
+  }
+
+  .entry-white li div {
+    font-size: 1.2rem;
+  }
+
+  .entry-black li {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .entry-white li span {
+    font-size: 1.5rem;
+  }
+
+  .entry-white {
+    margin-right: 6em;
+  }
+
+  .entry-white li div {
+    font-size: 1.5rem;
+  }
+
+  .entry-black li {
+    font-size: 1.5rem;
+  }
 }
 
 .entry-white li div div {
   width: 1em;
   height: 1em;
-}
-
-.entry-black li {
-  display: flex;
-  font-size: 1.3rem;
-  margin-bottom: 0.4em;
-  padding: 0.14em 0.1em;
-  color: white;
 }
 
 .entry-black li div {
@@ -283,13 +317,6 @@
   font-size: 0.8rem;
 }
 
-.moves-log p:last-child {
-  color: white;
-  margin-top: 1.7rem;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-}
-
 .actions {
   display: flex;
   flex-direction: row;
@@ -302,8 +329,10 @@
 }
 
 .abandon-button p {
-  font-size: 1rem;
+  color: white;
+  font-size: 1.2rem;
   margin-left: 0.3em;
+  margin-top: 1.5em;
 }
 
 .abandon-button i {
@@ -339,8 +368,10 @@
 }
 
 .draw-button p {
-  font-size: 1rem;
-  margin-left: 0.3em;
+  color: white;
+  font-size: 1.2rem;
+  margin-top: 1.55em;
+  margin-left: 0em;
 }
 
 .draw-popup {
@@ -377,13 +408,112 @@
 
 .move-buttons {
   margin-top: 1em;
-  margin-left: 2em;
+  margin-left: 5em;
 }
 
 .move-buttons span {
   color: white;
   font-size: 2rem;
   font-family: "Lexend", sans-serif;
+}
+
+@media (max-width: 1300px) {
+  .move-buttons span {
+    font-size: 1.7rem;
+  }
+  .move-buttons {
+    margin-left: 3em;
+    margin-top: 1.3em;
+  }
+}
+
+@media (max-width: 1250px) {
+  .move-buttons span {
+    font-size: 1.5rem;
+  }
+
+  .move-buttons {
+    margin-top: 1.5em;
+  }
+
+  .abandon-button p {
+    font-size: 1.2rem;
+  }
+
+  .abandon-button i {
+    margin-top: 2em;
+  }
+
+  .draw-button {
+    margin-left: 2em;
+  }
+
+  .draw-button p {
+    font-size: 1.2rem;
+    margin-left: 0.3em;
+  }
+}
+
+@media (max-width: 1000px) {
+  .move-buttons {
+    margin-left: 2rem;
+  }
+
+  .move-buttons span {
+    font-size: 1.3rem;
+  }
+
+  .abandon-button p {
+    font-size: 1rem;
+    margin-top: 2em;
+  }
+
+  .draw-button {
+    margin-left: 1em;
+  }
+
+  .draw-button p {
+    font-size: 1rem;
+    margin-top: 2em;
+  }
+}
+
+@media (max-width: 900px) {
+  .move-buttons {
+    margin-left: 0.5rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .move-buttons span {
+    font-size: 2rem;
+  }
+
+  .move-buttons {
+    margin-top: 1.2em;
+    margin-left: 10em;
+  }
+
+  .abandon-button p {
+    font-size: 1.3rem;
+    margin-top: 1.5em;
+  }
+
+  .abandon-button i {
+    font-size: 1.2rem;
+    margin-top: 1.6em;
+  }
+
+  .draw-button p {
+    font-size: 1.3rem;
+    margin-top: 1.5em;
+  }
+}
+
+@media (max-width: 550px) {
+  .move-buttons {
+    margin-left: 5em;
+  }
 }
 
 .backwards {
@@ -426,7 +556,7 @@
 }
 
 .adjust-margin {
-  margin-right: 3.3em;
+  margin-left: -0.3em;
 }
 
 .games-log {

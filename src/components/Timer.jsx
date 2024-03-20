@@ -78,11 +78,9 @@ function Timer({ color, fullLogMoves }) {
         color == "white" ? "0-1" : "1-0",
         moves,
         0,
-        {
-          minutesMiliseconds,
-          secondsInput,
-          increment,
-        }
+        minutesMiliseconds,
+        secondsInput,
+        increment
       );
     }
   }, [timer]);

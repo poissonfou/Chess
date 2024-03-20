@@ -44,6 +44,10 @@ function MovesBoard({
   let counter = 1;
 
   useEffect(() => {
+    setSelectedTime("10:00");
+  }, [hasEnded]);
+
+  useEffect(() => {
     currentMove = undefined;
 
     moveBackward = {
@@ -561,74 +565,40 @@ function MovesBoard({
             >
               {moves.length > 0 && (
                 <div>
-                  <div>
-                    <ol className={classes["entry-white"]}>
-                      {moves.map((move, index) => {
-                        let adjustMargin = "";
-                        if (moves.length == 1) {
-                          adjustMargin = classes["adjust-margin"];
+                  <ol className={classes["entry-white"]}>
+                    {moves.map((move, index) => {
+                      let adjustMargin = "";
+                      if (moves.length == 1) {
+                        adjustMargin = classes["adjust-margin"];
+                      }
+
+                      if (move[0][0][0] == "w") {
+                        let highlight;
+                        let number;
+                        if (currentMove == undefined) {
+                          highlight = index == moves.length - 1;
+                          currentMove = undefined;
+                        } else {
+                          highlight = index == currentMove;
                         }
 
-                        if (move[0][0][0] == "w") {
-                          let highlight;
-                          let number;
-                          if (currentMove == undefined) {
-                            highlight = index == moves.length - 1;
-                            currentMove = undefined;
-                          } else {
-                            highlight = index == currentMove;
-                          }
-
-                          if (index == 0) {
-                            number = <span>{index + 1 + " -"}</span>;
-                          } else if (index == 2) {
-                            number = <span>{index + " -"}</span>;
-                          } else {
-                            number = <span>{index - counter + " -"}</span>;
-                            counter++;
-                          }
-
-                          return (
-                            <li key={index}>
-                              {number}
-                              <div
-                                className={
-                                  highlight
-                                    ? `${classes["highlight"]} ${adjustMargin}`
-                                    : `${adjustMargin}`
-                                }
-                              >
-                                <div
-                                  className={`${classes[move[0][0]]} ${
-                                    classes["piece"]
-                                  } `}
-                                ></div>
-
-                                {move[0][1]}
-                                {move[0][2]}
-                              </div>
-                            </li>
-                          );
+                        if (index == 0) {
+                          number = <span>{index + 1 + " -"}</span>;
+                        } else if (index == 2) {
+                          number = <span>{index + " -"}</span>;
+                        } else {
+                          number = <span>{index - counter + " -"}</span>;
+                          counter++;
                         }
-                      })}
-                    </ol>
-                  </div>
-                  <div>
-                    <ul className={classes["entry-black"]}>
-                      {moves.map((move, index) => {
-                        if (move[0][0][0] == "b") {
-                          let highlight;
-                          if (currentMove == undefined) {
-                            highlight = index == moves.length - 1;
-                            currentMove = undefined;
-                          } else {
-                            highlight = index == currentMove;
-                          }
-                          return (
-                            <li
-                              key={index}
+
+                        return (
+                          <li key={index}>
+                            {number}
+                            <div
                               className={
-                                highlight ? `${classes["highlight"]}` : ``
+                                highlight
+                                  ? `${classes["highlight"]} ${adjustMargin}`
+                                  : `${adjustMargin}`
                               }
                             >
                               <div
@@ -636,14 +606,44 @@ function MovesBoard({
                                   classes["piece"]
                                 } `}
                               ></div>
+
                               {move[0][1]}
                               {move[0][2]}
-                            </li>
-                          );
+                            </div>
+                          </li>
+                        );
+                      }
+                    })}
+                  </ol>
+                  <ul className={classes["entry-black"]}>
+                    {moves.map((move, index) => {
+                      if (move[0][0][0] == "b") {
+                        let highlight;
+                        if (currentMove == undefined) {
+                          highlight = index == moves.length - 1;
+                          currentMove = undefined;
+                        } else {
+                          highlight = index == currentMove;
                         }
-                      })}
-                    </ul>
-                  </div>
+                        return (
+                          <li
+                            key={index}
+                            className={
+                              highlight ? `${classes["highlight"]}` : ``
+                            }
+                          >
+                            <div
+                              className={`${classes[move[0][0]]} ${
+                                classes["piece"]
+                              } `}
+                            ></div>
+                            {move[0][1]}
+                            {move[0][2]}
+                          </li>
+                        );
+                      }
+                    })}
+                  </ul>
                 </div>
               )}
             </div>
