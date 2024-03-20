@@ -321,7 +321,7 @@ export function canKingMove(
   if (kingsPosition.row == 0) {
     for (let j = kingRow; j > finalKingRow; j--) {
       for (let i = kingIdx; i < finalKingIdx; i++) {
-        if (j < 0 || i < 0) continue;
+        if (j < 0 || i < 0 || j > 7 || i > 7) continue;
         if (j == kingsPosition.row && i == kingsPosition.idx) continue;
         if (board[j][i] == 0 || board[j][i][0] == identifier) {
           newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
@@ -346,7 +346,7 @@ export function canKingMove(
   } else {
     for (let j = kingRow; j <= finalKingRow; j++) {
       for (let i = kingIdx; i <= finalKingIdx; i++) {
-        if (j > 7 || i > 7) continue;
+        if (j > 7 || i > 7 || i < 0 || j < 0) continue;
         if (j == kingsPosition.row && i == kingsPosition.idx) continue;
         if (board[j][i] == 0 || board[j][i][0] == identifier) {
           newBoard[j][i] = board[kingsPosition.row][kingsPosition.idx];
@@ -646,8 +646,23 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   //cheking if piece can be taken
   canBeTaken = isChecking(board, piecesChecking[0], opositeIdentifier);
 
-  if (canBeTaken.length) return false;
+  let validCapture;
+  let checking;
 
+  for (let i = 0; i < canBeTaken.length; i++) {
+    let newBoard = JSON.parse(JSON.stringify(board));
+    newBoard[piecesChecking[0].row][piecesChecking[0].idx] =
+      board[canBeTaken[i].row][canBeTaken[i].idx];
+    newBoard[canBeTaken[i].row][canBeTaken[i].idx] = 0;
+
+    checking = isChecking(newBoard, kingsPosition, identifier);
+    if (!checking.length) {
+      validCapture = true;
+      break;
+    }
+  }
+
+  if (validCapture) return false;
   //checking if piece can be covered
 
   //KNIGHT AND PAWNS
@@ -735,84 +750,86 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   // HOOKS
   if (board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "h") {
     //checking vertical
-    row =
-      kingsPosition.row < piecesChecking[0].row
-        ? piecesChecking[0].row - 1
-        : piecesChecking[0].row + 1;
+    if (piecesChecking[0].row !== kingsPosition.row) {
+      row =
+        kingsPosition.row < piecesChecking[0].row
+          ? piecesChecking[0].row - 1
+          : piecesChecking[0].row + 1;
 
-    if (kingsPosition.row < piecesChecking[0].row) {
-      for (let i = row; i < kingsPosition.row; i++) {
-        canBeTaken = isChecking(
-          board,
-          { row: i, idx: piecesChecking[0].idx },
-          opositeIdentifier
-        );
+      if (kingsPosition.row < piecesChecking[0].row) {
+        for (let i = row; i < kingsPosition.row; i++) {
+          canBeTaken = isChecking(
+            board,
+            { row: i, idx: piecesChecking[0].idx },
+            opositeIdentifier
+          );
 
-        if (canBeTaken.length) return false;
+          if (canBeTaken.length) return false;
+        }
+      } else {
+        for (let i = row; i > kingsPosition.row; i--) {
+          canBeTaken = isChecking(
+            board,
+            { row: i, idx: piecesChecking[0].idx },
+            opositeIdentifier
+          );
+
+          if (canBeTaken.length) return false;
+        }
       }
     } else {
-      for (let i = row; i > kingsPosition.row; i--) {
-        canBeTaken = isChecking(
-          board,
-          { row: i, idx: piecesChecking[0].idx },
-          opositeIdentifier
-        );
+      //checking horizontal
+      idx =
+        kingsPosition.idx < piecesChecking[0].idx
+          ? piecesChecking[0].idx + 1
+          : piecesChecking[0].idx - 1;
 
-        if (canBeTaken.length) return false;
-      }
-    }
-
-    //checking horizontal
-    idx =
-      kingsPosition.idx < piecesChecking[0].idx
-        ? piecesChecking[0].idx + 1
-        : piecesChecking[0].idx - 1;
-
-    if (kingsPosition.idx < piecesChecking[0].idx) {
-      for (let i = idx; i < kingsPosition.idx; i++) {
-        canBeTaken = isChecking(
-          board,
-          { row: kingsPosition.row, idx: i },
-          opositeIdentifier,
-          false
-        );
-
-        if (
-          canHorizontalBeCovered(
+      if (kingsPosition.idx < piecesChecking[0].idx) {
+        for (let i = idx; i < kingsPosition.idx; i++) {
+          canBeTaken = isChecking(
             board,
-            piecesChecking,
-            kingsPosition,
+            { row: kingsPosition.row, idx: i },
             opositeIdentifier,
-            identifier,
-            i
+            false
+          );
+
+          if (
+            canHorizontalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              i
+            )
           )
-        )
-          return false;
+            return false;
 
-        if (canBeTaken.length) return false;
-      }
-    } else {
-      for (let i = idx; i > kingsPosition.idx; i--) {
-        canBeTaken = isChecking(
-          board,
-          { row: kingsPosition.row, idx: i },
-          opositeIdentifier,
-          false
-        );
-
-        if (
-          canHorizontalBeCovered(
+          if (canBeTaken.length) return false;
+        }
+      } else {
+        for (let i = idx; i > kingsPosition.idx; i--) {
+          canBeTaken = isChecking(
             board,
-            piecesChecking,
-            kingsPosition,
+            { row: kingsPosition.row, idx: i },
             opositeIdentifier,
-            identifier,
-            i
-          )
-        )
-          return false;
+            false
+          );
 
-        if (canBeTaken.length) return false;
+          if (
+            canHorizontalBeCovered(
+              board,
+              piecesChecking,
+              kingsPosition,
+              opositeIdentifier,
+              identifier,
+              i
+            )
+          )
+            return false;
+
+          if (canBeTaken.length) return false;
+        }
       }
     }
   }
@@ -820,6 +837,7 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
   //  QUEEN
   if (board[piecesChecking[0].row][piecesChecking[0].idx] == identifier + "q") {
     //checking horizontal
+
     if (piecesChecking[0].row == kingsPosition.row) {
       idx =
         kingsPosition.idx < piecesChecking[0].idx
@@ -984,7 +1002,6 @@ export function isCheckMate(board, kingsPosition, identifier, piecesChecking) {
 export function isDraw(
   kingsPosition,
   pieceIdentifier,
-  newBoard,
   board,
   opositeColor,
   turn
@@ -1008,7 +1025,7 @@ export function isDraw(
     finalKingRow,
     kingIdx,
     finalKingIdx,
-    newBoard,
+    board,
     pieceIdentifier
   );
 

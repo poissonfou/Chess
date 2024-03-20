@@ -13,6 +13,17 @@ let blackKey;
 let moves;
 let turn;
 
+// const arrBoard = [
+//   [0, 0, 0, 0, 0, "bq", 0, "bk"],
+//   [0, 0, 0, 0, 0, 0, 0, "bp"],
+//   [0, 0, 0, 0, "wb", 0, "bp", 0],
+//   [0, 0, 0, 0, 0, 0, "wp", 0],
+//   [0, 0, 0, 0, 0, 0, 0, "wk"],
+//   [0, 0, 0, 0, 0, "bp", 0, "wn"],
+//   [0, 0, 0, 0, 0, 0, 0, "bh"],
+//   [0, 0, 0, 0, "wh", "wh", 0, 0],
+// ];
+
 const arrBoard = [
   ["bh", "bn", "bb", "bq", "bk", "bb", "bn", "bh"],
   ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
@@ -25,6 +36,10 @@ const arrBoard = [
 ];
 
 let piecesTaken = { white: [], black: [] };
+let kingsPosition = {
+  white: { row: 7, idx: 4, hasMoved: false },
+  black: { row: 0, idx: 4, hasMoved: false },
+};
 let fullLogMoves = [];
 
 function App() {
@@ -38,6 +53,12 @@ function App() {
 
   if (hasEnded && turn !== "") {
     fullLogMoves = [];
+  }
+
+  function updateKingsPosition(turn, final, hasMoved) {
+    kingsPosition[turn].row = final.row;
+    kingsPosition[turn].idx = final.idx;
+    kingsPosition[turn].hasMoved = hasMoved;
   }
 
   return (
@@ -63,6 +84,8 @@ function App() {
           fullLogMoves={fullLogMoves}
           highlightCase={highlightCase}
           setHighlightCase={setHighlightCase}
+          kingsPosition={kingsPosition}
+          updateKingsPosition={updateKingsPosition}
         />
         <div className="player-info">
           <Timer key={whiteKey} color={"white"} fullLogMoves={fullLogMoves} />
@@ -76,6 +99,7 @@ function App() {
         piecesTaken={piecesTaken}
         fullLogMoves={fullLogMoves}
         setHighlightCase={setHighlightCase}
+        updateKingsPosition={updateKingsPosition}
       />
     </div>
   );

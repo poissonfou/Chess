@@ -22,6 +22,7 @@ function MovesBoard({
   piecesTaken,
   fullLogMoves,
   setHighlightCase,
+  updateKingsPosition,
 }) {
   let moves = useSelector((state) => state.moves.moves);
   let turn = useSelector((state) => state.turn.turn);
@@ -391,6 +392,9 @@ function MovesBoard({
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
     dispatch(timerActions.setRunningTimer(null));
+    updateKingsPosition("white", { row: 7, idx: 4 }, false);
+    updateKingsPosition("black", { row: 0, idx: 4 }, false);
+
     saveGame(dispatch, fullLogMoves, "1/2", moves, selectedTime);
   }
 
@@ -400,6 +404,9 @@ function MovesBoard({
     dispatch(hasEndedActions.setHasEnded());
     dispatch(hasEndedActions.setShowPopup());
     dispatch(timerActions.setRunningTimer(null));
+
+    updateKingsPosition("white", { row: 7, idx: 4 }, false);
+    updateKingsPosition("black", { row: 0, idx: 4 }, false);
 
     saveGame(
       dispatch,
@@ -515,7 +522,7 @@ function MovesBoard({
           {!showPlay && (
             <div
               className={
-                games.length > 5
+                games.length > 4
                   ? `${classes["games-log"]} ${classes.overflow}`
                   : `${classes["games-log"]}`
               }

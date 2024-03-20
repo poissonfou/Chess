@@ -31,10 +31,6 @@ import {
 import BoardRow from "./BoardRow";
 import { useGameInfo } from "../hooks/useGameInfo";
 
-let kingsPosition = {
-  white: { row: 7, idx: 4, hasMoved: false },
-  black: { row: 0, idx: 7, hasMoved: false },
-};
 let hooksMoved = {
   white: { queenSide: false, kingSide: false },
   black: { queenSide: false, kingSide: false },
@@ -57,6 +53,8 @@ function ChessBoard({
   fullLogMoves,
   highlightCase,
   setHighlightCase,
+  kingsPosition,
+  updateKingsPosition,
 }) {
   let { minutesMiliseconds, secondsInput, increment } = useGameInfo();
   const dispatch = useDispatch();
@@ -167,7 +165,6 @@ function ChessBoard({
       let draw = isDraw(
         kingsPosition,
         pieceIdentifier,
-        board,
         newBoard,
         opositeColor,
         turn
@@ -179,6 +176,9 @@ function ChessBoard({
         dispatch(hasEndedActions.setHasEnded());
         dispatch(hasEndedActions.setShowPopup());
         dispatch(timerActions.setRunningTimer(null));
+
+        updateKingsPosition("white", { row: 7, idx: 4 }, false);
+        updateKingsPosition("black", { row: 0, idx: 4 }, false);
 
         saveGame(
           dispatch,
@@ -194,7 +194,6 @@ function ChessBoard({
       }
     }
 
-    console.log(moves);
     if (checkMate) {
       piecesAttacking = [];
       checkMate = false;
@@ -202,6 +201,9 @@ function ChessBoard({
       dispatch(hasEndedActions.setHasEnded());
       dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
+
+      updateKingsPosition("white", { row: 7, idx: 4 }, false);
+      updateKingsPosition("black", { row: 0, idx: 4 }, false);
 
       saveGame(
         dispatch,
@@ -238,12 +240,6 @@ function ChessBoard({
       dispatch(movesActions.push(move));
     }
   };
-
-  function updateKingsPosition(turn, final, hasMoved) {
-    kingsPosition[turn].row = final.row;
-    kingsPosition[turn].idx = final.idx;
-    kingsPosition[turn].hasMoved = hasMoved;
-  }
 
   function updateHooksMoved(turn, side, hasMoved) {
     hooksMoved[turn][side] = hasMoved;
@@ -559,11 +555,13 @@ function ChessBoard({
         increment
       );
 
+      updateKingsPosition("white", { row: 7, idx: 4 }, false);
+      updateKingsPosition("black", { row: 0, idx: 4 }, false);
       dispatch(turnActions.changeTurn(turn));
       dispatch(hasEndedActions.setHasEnded());
       dispatch(hasEndedActions.setShowPopup());
       dispatch(timerActions.setRunningTimer(null));
-
+      resetPiece();
       return;
     }
 
@@ -573,7 +571,6 @@ function ChessBoard({
         kingsPosition,
         pieceIdentifier,
         newBoard,
-        board,
         opositeColor,
         turn
       );
@@ -591,12 +588,13 @@ function ChessBoard({
           secondsInput,
           increment
         );
-
+        updateKingsPosition("white", { row: 7, idx: 4 }, false);
+        updateKingsPosition("black", { row: 0, idx: 4 }, false);
         dispatch(turnActions.changeTurn("draw"));
         dispatch(hasEndedActions.setHasEnded());
         dispatch(hasEndedActions.setShowPopup());
         dispatch(timerActions.setRunningTimer(null));
-
+        resetPiece();
         return;
       }
     }

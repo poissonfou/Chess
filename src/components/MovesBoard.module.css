@@ -149,7 +149,7 @@
   width: 100%;
   padding: 0;
   margin: 0 5em;
-  margin-left: 0em;
+  margin-left: -0.5em;
   margin-right: 1em;
 }
 
@@ -158,26 +158,31 @@
   font-size: 1.5rem;
   margin-bottom: 0.5em;
   color: white;
+  width: 5.8em;
+}
+
+.entry-white li span {
+  width: 2em;
 }
 
 .entry-white li div {
   display: flex;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   padding: 0.1em 0.1em;
   margin-bottom: 0em;
   color: white;
 }
 
 .entry-white li div div {
-  width: 1.3em;
+  width: 1em;
   height: 1em;
 }
 
 .entry-black li {
   display: flex;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   margin-bottom: 0.4em;
-  padding: 0.1em 0.1em;
+  padding: 0.14em 0.1em;
   color: white;
 }
 
