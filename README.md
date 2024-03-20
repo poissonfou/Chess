@@ -1,1 +1,1 @@
-Chess pieces assets were taken from https://greenchess.net/info.php?item=downloads, under the CreativeCommons license (https://creativecommons.org/publicdomain/zero/1.0/legalcode.en). I don't claim ownership of these images, nor did I modify them.
+Chess pieces assets were taken from https://greenchess.net/info.php?item=downloads, under the CreativeCommons license. I don't claim ownership of these images, nor did I modify them.
