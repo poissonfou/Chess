@@ -1,0 +1,67 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+body {
+  background-color: rgb(10, 10, 10);
+  font-family: "Geologica", sans-serif;
+}
+
+body button:hover {
+  cursor: pointer;
+}
+
+.bp {
+  background-image: url("./assets/blackPawn.png");
+}
+
+.br {
+  background-image: url("./assets/blackHook.png");
+}
+
+.bn {
+  background-image: url("./assets/blackKnight.png");
+}
+
+.bb {
+  background-image: url("./assets/blackBishop.png");
+}
+
+.bq {
+  background-image: url("./assets/blackQueen.png");
+}
+
+.bk {
+  background-image: url("./assets/blackKing.png");
+}
+
+.wp {
+  background-image: url("./assets/whitePawn.png");
+}
+
+.wr {
+  background-image: url("./assets/whiteHook.png");
+}
+
+.wn {
+  background-image: url("./assets/whiteKnight.png");
+}
+
+.wb {
+  background-image: url("./assets/whiteBishop.png");
+}
+
+.wq {
+  background-image: url("./assets/whiteQueen.png");
+}
+
+.wk {
+  background-image: url("./assets/whiteKing.png");
+}
+
+:where(.bp, .br, .bn, .bb, .bq, .bk, .wp, .wr, .wn, .wb, .wq, .wk) {
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+:where(.bp, .br, .bn, .bb, .bq, .bk, .wp, .wr, .wn, .wb, .wq, .wk):hover {
+  cursor: pointer;
+}
