@@ -1,4 +1,4 @@
-<h1>Discription</h1>
+<h1>Description</h1>
 This is a simple webpage to play chess locally. Made with React.js and OOP(to model the chess pieces)
 
 <h1>How to run</h1>
