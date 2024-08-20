@@ -1,8 +1,10 @@
-# React + Vite
+<h1>Discription</h1>
+This is a simple webpage to play chess locally. Made with React.js and OOP(to model the chess pieces)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<h1>How to run</h1>
+npm i <br>
+npm run dev
+<br>
+<br>
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Captura de tela_20-8-2024_144513_localhost](https://github.com/user-attachments/assets/6220ef1e-61be-4dec-b584-440a215981b0)
