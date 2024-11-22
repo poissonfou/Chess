@@ -1,0 +1,7 @@
+.main__container {
+  display: grid;
+  grid-template-columns: 0.5fr 1fr;
+  margin: 0em 2em;
+  align-items: center;
+  justify-items: center;
+}

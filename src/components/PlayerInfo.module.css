@@ -1,0 +1,17 @@
+.pieces__taken {
+  height: 20px;
+  display: flex;
+}
+
+.pieces__taken div {
+  width: 20px;
+  height: 20px;
+}
+
+.piece + .piece {
+  margin-left: -0.7em;
+}
+
+.piece:hover {
+  cursor: initial !important;
+}

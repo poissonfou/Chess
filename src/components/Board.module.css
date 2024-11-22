@@ -1,0 +1,29 @@
+.board__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 64px);
+  grid-template-rows: repeat(8, 64px);
+  margin: 0.3em;
+}
+
+.dark {
+  background-color: rgb(36, 129, 36);
+}
+
+.light {
+  background-color: rgb(248, 238, 238);
+}
+
+.highlight__case {
+  background-color: rgb(118, 185, 121);
+}
+
+.relative {
+  position: relative;
+}
+
+.player__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
