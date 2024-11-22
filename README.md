@@ -5,3 +5,6 @@
   <li>npm i</li>
   <li>npm run dev</li>
 </ul>
+<br />
+<img src="https://github.com/user-attachments/assets/3c937a7b-f253-43d7-bbcc-04fe376a8d89" />
+
